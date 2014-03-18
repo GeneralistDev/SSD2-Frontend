@@ -4,7 +4,7 @@ README
 Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
 
 ###Dependencies
-1. Install nginx, nodejs, ruby and compass
+1. Install nginx, nodejs, ruby and ruby-compass
     ```
     sudo apt-get install <package-name>
     ```
