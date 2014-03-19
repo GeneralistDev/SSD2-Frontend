@@ -1,5 +1,70 @@
 README
 ===
+##Setup and Dependencies
+Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
+
+###Dependencies
+1. Install nginx, nodejs, ruby and ruby-compass
+    ```
+    sudo apt-get install <package-name>
+    ```
+
+2. Install nodejs libraries: karma-jasmine, connect-modrewrite, grunt-cli, and yeoman
+    ```
+    sudo npm install -g <package-name>
+    ```
+
+3. Install Bower
+    ```
+    bower install
+    ```
+
+###Setup and Configuration
+1.  Configure nginx directory ownership and group. (Replace &lt;username> with your linux username)
+    ```
+    sudo chgrp -R www-data /usr/share/nginx/html
+    ```
+
+    ```
+    sudo chown -R <username> /usr/share/nginx/html
+    ```
+    
+2. Fix the nginx web root and enable single page websites
+    1. Open the default nginx site configuration
+        ```
+        gksu gedit /etc/nginx/sites-available/default
+        ```
+
+    2. Find the line ```root /usr/share/nginx/html;``` and replace it with ```root         /usr/share/nginx/html/dist;```
+    3. Find the line ```try_files $uri $uri/ /index.html;``` and replace it with ```try_files $uri /index.html;```
+    4. Save the file and exit gedit.
+    
+    5. Restart nginx
+        ```
+        sudo service nginx restart
+        ```
+        
+        
+3. *Optional but recommended: Create a symbolic link to the nginx web root in your documents
+    ```
+    ln -s /usr/share/nginx/html ~/Documents/html
+    ```
+
+4. Pull the SSD2-Frontend repository to the html root
+    ```
+    cd ~/Documents/html && git init && git remote add origin https://github.com/rlgod/SSD2-Frontend.git && git pull origin master
+    ```
+5. Install project dependencies
+    ```
+    npm install
+    ```
+    If this step fails then delete the ```node_modules``` directory in the project root and execute the above         command again
+
+6. Build the web application
+    ```
+    grunt build
+    ```
+
 ## Code Review Process
 This standard for code review is intended to improve both source code quality and also the cross-developer awareness. All development team members must follow this code review process and ensure that the process is followed at all times.
 
