@@ -9,7 +9,7 @@ Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
     sudo apt-get install <package-name>
     ```
 
-2. Install nodejs libraries: karma-jasmine, connect-modrewrite, grunt-ui, and yeoman
+2. Install nodejs libraries: karma-jasmine, connect-modrewrite, grunt-cli, and yeoman
     ```
     sudo npm install -g <package-name>
     ```
@@ -54,8 +54,13 @@ Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
     ```
     cd ~/Documents/html && git init && git remote add origin https://github.com/rlgod/SSD2-Frontend.git && git pull origin master
     ```
+5. Install project dependencies
+    ```
+    npm install
+    ```
+    If this step fails then delete the ```node_modules``` directory in the project root and execute the above         command again
 
-5. Build the web application
+6. Build the web application
     ```
     grunt build
     ```
