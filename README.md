@@ -14,11 +14,6 @@ Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
     sudo npm install -g <package-name>
     ```
 
-3. Install Bower
-    ```
-    bower install
-    ```
-
 ###Setup and Configuration
 1.  Configure nginx directory ownership and group. (Replace &lt;username> with your linux username)
     ```
@@ -54,13 +49,18 @@ Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
     ```
     cd ~/Documents/html && git init && git remote add origin https://github.com/rlgod/SSD2-Frontend.git && git pull origin master
     ```
-5. Install project dependencies
+5. Install Bower Dependencies
+    ```
+    bower install
+    ```
+
+6. Install project dependencies
     ```
     npm install
     ```
     If this step fails then delete the ```node_modules``` directory in the project root and execute the above         command again
 
-6. Build the web application
+7. Build the web application
     ```
     grunt build
     ```
