@@ -20,6 +20,10 @@ angular.module('frontendApp', [
         templateUrl: 'views/contact.html',
         controller: 'ContactCtrl'
       })
+      .when('/ui', {
+        templateUrl: 'views/ui.html',
+        controller: 'UiCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

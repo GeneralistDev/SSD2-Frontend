@@ -9,4 +9,6 @@ angular.module('frontendApp')
   })
   .controller('ContactCtrl', function ($scope) {
     $scope.message = 'dparker.tech@gmail.com';
+  })
+  .controller('UiCtrl', function ($scope) {
   });
