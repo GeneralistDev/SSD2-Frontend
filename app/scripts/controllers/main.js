@@ -2,29 +2,31 @@
 
 angular.module('frontendApp')
     .controller('MainCtrl', function ($scope) {
-	   $scope.message = 'This is the homepage message';
+	    $scope.message = 'This is the homepage message';
     })
     .controller('AboutCtrl', function ($scope) {
         $scope.message = ['Daniel', 'Zak', 'Huan'];
-    })
+      })
     .controller('ContactCtrl', function ($scope) {
-        $scope.message = 'dparker.tech@gmail.com';
-    })
+        $scope.message = ['dparker.tech@gmail.com', 'zak.chitty.work@gmail.com'];
+      })
     .controller('UiCtrl', function ($scope) {
         $().w2destroy('layout');
         var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 5px;';
         $('#layout').w2layout({
             name: 'layout',
             panels: [
-                { type: 'main',  size: 400, resizable: true, style: pstyle, content: 'main' },
-                { type: 'preview', size: 200, resizable: true, style: pstyle, content: 'preview' }
-            ]
-        }); // End layout
+                { type: 'left',  size: 200, resizable: true, style: pstyle, content: 'palette' },
+                { type: 'main', size: 600, resizable: true, style: pstyle,  },
+                { type: 'bottom',  size: 200, resizable: true, style: pstyle, content: 'DSL' },
+                { type: 'right',  size: 200, resizable: true, style: pstyle, content: 'preview' }
+              ]
+            }); // End layout
         $scope.$on('$routeChangeSuccess', function(){
             
 
-            var width = 650,
-                height = 450;
+            var width = 1500,
+                height = 1500;
 
             var nodes = d3.range(200).map(function() { return {radius: Math.random() * 12 + 4}; }),
                 root = nodes[0];
@@ -40,22 +42,22 @@ angular.module('frontendApp')
 
             force.start();
 
-            var canvas = d3.select("#layout_layout_panel_main > div.w2ui-panel-content").append("canvas")
-                .attr("width", width) 
-                .attr("height", height);
+            var canvas = d3.select('#layout_layout_panel_main > div.w2ui-panel-content').append('canvas')
+                .attr('width', width)
+                .attr('height', height);
 
-            var context = canvas.node().getContext("2d");
+            var context = canvas.node().getContext('2d');
 
-            force.on("tick", function(e) {
+            force.on('tick', function(e) {
               var q = d3.geom.quadtree(nodes),
                   i,
                   d,
                   n = nodes.length;
 
-              for (i = 1; i < n; ++i) q.visit(collide(nodes[i]));
+              for (i = 1; i < n; ++i) {q.visit(collide(nodes[i]));}
 
               context.clearRect(0, 0, width, height);
-              context.fillStyle = "steelblue";
+              context.fillStyle = 'steelblue';
               context.beginPath();
               for (i = 1; i < n; ++i) {
                 d = nodes[i];
@@ -65,7 +67,7 @@ angular.module('frontendApp')
               context.fill();
             });
 
-            canvas.on("mousemove", function() {
+            canvas.on('mousemove', function() {
               var p1 = d3.mouse(this);
               root.px = p1[0];
               root.py = p1[1];
