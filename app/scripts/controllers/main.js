@@ -7,10 +7,16 @@ angular.module('frontendApp')
     .controller('AboutCtrl', function ($scope) {
         $scope.message = ['Daniel', 'Zak', 'Huan'];
       })
-    .controller('ContactCtrl', function ($scope) {
+    .controller('ContactCtrl', function ( $scope) {
         $scope.message = ['dparker.tech@gmail.com', 'zak.chitty.work@gmail.com'];
       })
-    .controller('UiCtrl', function ($scope) {
+    .controller('UiCtrl', function ($window, $scope) {
+        
+        $scope.submit = function() {
+          $window.alert("submitted!");
+        }
+
+
         $().w2destroy('layout');
         var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 5px;';
         $('#layout').w2layout({

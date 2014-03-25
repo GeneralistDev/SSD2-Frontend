@@ -1,0 +1,17 @@
+{
+	"people" : [
+		{ 
+		"name" : "fred", 
+		"id" : "0",
+		"links" : [{"id" : "1",
+		"relationship" : "mate"},
+		  {"id" : "2",
+		  "relationship" : "sister"}]
+		},
+		{ 
+		"name" : "garry",
+		"id" : "5"
+		"friends" : [{"id" : "3"},
+		{"id" : "4"}]}
+	]	
+}
