@@ -108,3 +108,49 @@ b8c028e Merge pull request #141 from Rovak/grunt/watchtask
 516f7dd jshint warnings
 09573e1 trailing spaces
 ```
+
+##Branch Naming Standard
+Author: <a href=mailto:zakwak01@gmail.com>Zakariah Chitty</a>
+
+## Code Review Process
+This standard for branch naming is intended to improve the clarity of the purpose of branches. All development team members must follow this standard and ensure that the standard is followed at all times.
+
+### Branch Clasification
+A branch can come in one of three flavours as shown below: 
+
+Clasification:   Description:
+*feat            Feature being added or expanded
+*bug             Major bug fixing. 
+*junk            Throwaway branch created to experiment or spike
+
+Rules
+*Typcally bug branches should only be used in circumstances where the original feature branch has already been merged to master and it would be impractical to revive it. Other instances may be where a group of small unrelated bugs need to be addressed. 
+*Junk branches should not get merged to master as they are experimental. The code in these branches are really only there to document experimentation and to facilitate a way of getting feedback on said experiments(or spikes).
+
+### Basic Name Structure
+The full branch name should consist of two parts. The branch clasification and the descriptive title. The two form the full branch name as seen bellow:
+
+branch-clasification/Descriptive-Title
+
+Rules:
+* The descriptive title should be camel cased with each word seperated by a '-'.
+* The branch clasification should be written in all lowercase and followed by a '/'.
+* Issue codes and all number strings are not valid descriptive titles!
+* The descriptive title should try and be descriptive and not simply a rewording of an existing or an inactive branch. In such a case where a previouse feature is being enhanced, that old branch should be revived if possible.If this is not possible simply append the phrase the name in terms of an enhancement. The forming of descriptive names is somewhat subjective so this rule should be considered more of a guideline. 
+
+#### Examples:
+```
+feat/Feature-X
+junk/W2ui-Panel-Layouts
+```
+
+For more information on branch naming see:
+http://stackoverflow.com/questions/273695/git-branch-naming-best-practices
+
+
+
+
+
+
+
+
