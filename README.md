@@ -141,6 +141,7 @@ Rules:
 #### Examples:
 ```
 feat/Feature-X
+bug/Rendering-Performance
 junk/W2ui-Panel-Layouts
 ```
 
