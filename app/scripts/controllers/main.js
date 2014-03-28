@@ -2,8 +2,6 @@
 
 angular.module('frontendApp')
     .controller('MainCtrl', function ($window, $scope) {
-      
-      $scope.person = 'george';
 
       $scope.submit = function() {
         $window.alert("submitted!");
