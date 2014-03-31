@@ -35,14 +35,15 @@ angular.module('frontendApp')
 
       var graph = new myGraph('#layout_layout_panel_main > div.w2ui-panel-content', 1500, 1500);
       
-      graph.addNode("Cause");
-      graph.addNode("Effect");
+      graph.addNode("Cause", 30, 30);
+      graph.addNode("Effect", graph.getWidth()/2, graph.getHeight()/2);
 
       graph.addLink("Cause", "Effect", "fred");
       
-      d3.select(graph.vis).onclick = function() {
-        graph.addNode("fred", d3.mouse(this)[0], d3.mouse(this)[0]);
-      };
+      /*d3.select('#layout_layout_panel_main > div.w2ui-panel-content').onclick = function() {
+        alert("Derp");
+        graph.addNode("fred", d3.mouse(this)[0], d3.mouse(this)[1]);
+      };*/
     }); // End scope Event
   });
 
@@ -50,11 +51,13 @@ function myGraph(rootElement, width, height) {
 
   // Add and remove elements on the graph object
   this.addNode = function (id, x, y) {
-    x = x || (width / 2);
-    y = y || (height / 2);
+    x = x;
+    y = y;
     id = id || (nodes.size + 1);
       nodes.push({
         "id":id,
+        "x" : x,
+        "y" : y,
         "fixed": true});
       update();
   }
@@ -95,21 +98,35 @@ function myGraph(rootElement, width, height) {
       for (var i in nodes) {if (nodes[i]["id"] === id) return i};
   }
 
+  this.getWidth = function(){
+    return $(rootElement).width();
+  }
+
+  this.getHeight = function(){
+    return $(rootElement).height();
+  }
+
   // set up the D3 visualisation in the specified element
   //canvas default size is the size of the root element
   width = width || $(rootElement).innerWidth();
   height = height || $(rootElement).innerHeight();
 
   var vis = this.vis = d3.select(rootElement).append("svg:svg")
-      .attr("width", width)
-      .attr("height", height);
+      .attr("width", function(){$(this).parent().width();})
+      .attr("height", function(){$(this).parent().height();})
+      .on("click", function(d, i) {
+        alert("click detected");
+        graph.addNode("fred", d3.mouse(this)[0], d3.mouse(this)[1]);
+      });
 
   var force = d3.layout.force()
       .gravity(.05)
-      .size([width, height]);
+      .size([$(rootElement).width(), $(rootElement).height()]);
 
   var nodes = force.nodes(),
       links = force.links();
+
+  var drag = force.drag();
 
   var update = function () {
     //transforming stuff?? VVV
@@ -138,7 +155,7 @@ function myGraph(rootElement, width, height) {
 
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
-        .call(force.drag);
+        .call(drag);
 
     nodeEnter.append("image")
         .attr("class", "circle")
@@ -164,6 +181,9 @@ function myGraph(rootElement, width, height) {
           .attr("y1", function(d) { return d.source.y; })
           .attr("x2", function(d) { return d.target.x; })
           .attr("y2", function(d) { return d.target.y; });
+
+      /*node.attr("cx", function(d) {return d.x; })
+          .attr("cy", function(d) {return d.y; });*/
 
       node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
     });
