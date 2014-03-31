@@ -108,3 +108,69 @@ b8c028e Merge pull request #141 from Rovak/grunt/watchtask
 516f7dd jshint warnings
 09573e1 trailing spaces
 ```
+
+##Commit Message Standard
+Author: <a href=mailto:zakwak01@gmail.com>Zakariah Chitty</a>
+
+###Key Words
+Keywords are words that classify the change being made. These appear at the beginning of a commit message. 
+
+####DOC
+Changes that are related to documentation.
+
+Rules:
+Doc must only be used in conjunction with another keyword. The two keywords are hyphenated together (e.g., Doc-New, Doc-Enhance). 
+
+Examples: 
+```
+67898aa DOC-NEW: Architecture design document for module X.
+
+b8c028e DOC-ENHANCE: Added a class diagram outlining characteristic Y to the architecture design document for Module X.
+```
+
+####FIXED
+Changes related to addressing issues, defects and/ or bugs. 
+
+Rules:
+If the fix is related to a documented issue, this should be referenced in the commit message. Otherwise if the fix had not been previously documented then it should be described to a level of detail that is suitable for the given context. 
+
+Example: 
+```
+FIXED: Addressed issue #7 bug found in Module X.
+```
+
+####NEW
+Creating a new feature that did not already exist. This can also relate to doing basic plumbing. 
+
+Example: 
+```
+NEW: Module X class to achieve feature Y
+
+NEW: Screen to display information Z.
+```
+
+####ENHANCED
+Updating or improving a feature, or aspect of the code that is not looks, performance based or a fix. 
+
+Example: 
+```
+ENHANCED: Module X to perform feature Y.
+```
+
+####LOOKS
+Non functional changes, i.e., prettifying. This will typically relate to the UI.
+Example: 
+```
+LOOKS: Screen X now displays information Y in a cleaner way. 
+```
+
+####PERFORMANCE
+Improving execution rates of existing features. 
+
+Example: 
+```
+PERFORMANCE: Improvement for Module X when doing task X. 
+```
+
+###Other Practices
+Changes can be related to the artifacts in a generic way (e.g., Fixed spelling mistakes in the UI on screen X) or if necessary changes can be related to artifacts at a file level (e.g., Commented File X to conform with commenting standards). It is up to the author to decide what is appropriate in a given scenario. 
