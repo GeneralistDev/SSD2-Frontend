@@ -33,33 +33,63 @@ angular.module('frontendApp')
 
     $scope.$on('$routeChangeSuccess', function() {
 
-      var graph = new myGraph('#layout_layout_panel_main > div.w2ui-panel-content', 1500, 1500);
-      
-      graph.addNode("Cause", 30, 30);
-      graph.addNode("Effect", graph.getWidth()/2, graph.getHeight()/2);
-
-      graph.addLink("Cause", "Effect", "fred");
-      
-      /*d3.select('#layout_layout_panel_main > div.w2ui-panel-content').onclick = function() {
-        alert("Derp");
-        graph.addNode("fred", d3.mouse(this)[0], d3.mouse(this)[1]);
-      };*/
+      var editorGraph = new myGraph('#layout_layout_panel_main > div.w2ui-panel-content', 1500, 1500);
+      var editorOb = new editor(editorGraph);
     }); // End scope Event
   });
 
+function editor(graph) {    
+  var node1 = graph.addNode("Cause", 50, 40);
+  var node2 = graph.addNode("Effect", 70, 60);
+
+  graph.addLink(node1, node2, "fred");
+  // graph.selection.addNodeMode = true;
+
+  graph.dispatch = d3.dispatch("canvasMouseDown", "nodeMouseDown", "linkMouseDown");
+  graph.dispatch.on("canvasMouseDown", function(point){
+    
+    
+      graph.addNode("", point[0], point[1] );
+    // if( graph.selection.addNodeMode ) {
+    //   var point = d3.mouse(this);
+    //   // selection.addNodeMode = false;
+    // }
+  })
+  .on("nodeMouseDown", function(){
+    console.log("node clicked");
+  })
+  .on("linkMouseDown", function(){
+    console.log("link clicked");
+  })
+  //select nodes and add selection behavior
+}
+
 function myGraph(rootElement, width, height) {
 
+  // var selection = new selectionManager();
+  var dispatch;
+  var _self = this;
+  var nodeCount = this.nodeCount = 0;
+
   // Add and remove elements on the graph object
-  this.addNode = function (id, x, y) {
+  this.addNode = function (name, x, y) {
     x = x;
     y = y;
-    id = id || (nodes.size + 1);
-      nodes.push({
+    var id = " " + (++nodeCount);
+    
+    name = name || (" ");
+    var node = {
         "id":id,
-        "x" : x,
-        "y" : y,
-        "fixed": true});
+        "fixed": true,
+        "x": x,
+        "y": y,
+        "name": name
+      };
+
+      nodes.push(node);
       update();
+
+      return node;
   }
 
   this.removeNode = function (id) {
@@ -76,15 +106,19 @@ function myGraph(rootElement, width, height) {
       update();
   }
 
-  this.addLink = function (source, target, id) {
-      links.push({
-        "source":findNode(source),
-        "target":findNode(target),
-        "id": id,
+  this.addLink = function (sourceID, targetID, linkID) {
+      var link = {
+        "source":sourceID,
+        "target":targetID,
+        "id": linkID,
         "fixed": true
-      });
+      };
+
+      links.push(link);
       
       update();
+
+      return link;
   }
 
   var findNode = function(id) {
@@ -114,9 +148,9 @@ function myGraph(rootElement, width, height) {
   var vis = this.vis = d3.select(rootElement).append("svg:svg")
       .attr("width", function(){$(this).parent().width();})
       .attr("height", function(){$(this).parent().height();})
-      .on("click", function(d, i) {
-        alert("click detected");
-        graph.addNode("fred", d3.mouse(this)[0], d3.mouse(this)[1]);
+      .on('mousedown', function() {
+        var point = d3.mouse(this);
+        _self.dispatch.canvasMouseDown(point);
       });
 
   var force = d3.layout.force()
@@ -136,7 +170,11 @@ function myGraph(rootElement, width, height) {
         });
 
     var linkEnter = link.enter().append("line")
-        .attr("class", "link");
+        .attr("class", "link")
+        .on('mousedown', function(){
+          d3.event.stopPropagation();  
+          _self.dispatch.linkMouseDown();
+        })
 
     linkEnter.append("text")
         .attr("class", "linktext")
@@ -155,6 +193,10 @@ function myGraph(rootElement, width, height) {
 
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
+        .on('mousedown', function(){
+          d3.event.stopPropagation();  
+          _self.dispatch.nodeMouseDown();
+        })
         .call(drag);
 
     nodeEnter.append("image")
@@ -170,7 +212,7 @@ function myGraph(rootElement, width, height) {
         .attr("dx", ".35em")
         .attr("dy", 80)
         .text(function(d) {
-          return d.id;
+          return d.name;
         });
 
     //removes any nodes that have     
