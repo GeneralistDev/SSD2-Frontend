@@ -1,9 +1,25 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('MainCtrl', function ($window, $scope) {
+  .controller('MainCtrl', function ($window, $scope, $compile, $timeout, $document) {
+
+    $scope.attributes = {
+      name: "red"
+    };
+
+    $scope.attributesChangeHandler = function() {
+      console.log("attributesChangeHandler");
+      editorOb.refresh();
+    }
 
     $scope.submit = function() {
+      // $window.alert("submitted!");
+      // $scope.attributes.name = "fred";
+      editorOb.refresh();
+
+    }
+
+    $scope.submitFred = function() {
       $window.alert("submitted!");
     }
 
@@ -30,15 +46,39 @@ angular.module('frontendApp')
     });
     
     w2ui['layout'].content('right', w2ui['rightPanelLayout']);
+    // w2ui['rightPanelLayout'].load('main', 'views/attributes_panel.html');
+
+    var editorOb;
 
     $scope.$on('$routeChangeSuccess', function() {
 
+      //injects the attributes html into the attributes panel
+      $timeout(function() {
+        //compiles and binds the angular code for the attributes
+        $("#layout_rightPanelLayout_panel_main > div.w2ui-panel-content").html(
+          $compile(
+            "<form>Name: <input type='text' name='attributeName' ng-model='attributes.name' ng-change='attributesChangeHandler()'></form>"
+          )($scope));
+        $scope.$apply();
+      });
+
+
       var editorGraph = new myGraph('#layout_layout_panel_main > div.w2ui-panel-content', 1500, 1500);
-      var editorOb = new editor(editorGraph);
+      editorOb = new editor(editorGraph);
     }); // End scope Event
+
+    //call this if modifying the scope from outside of the controller
+    $scope.apply = function() {
+      $scope.$apply();
+    }
   });
 
-function editor(graph) {    
+function editor(graph) {  
+  var scope = angular.element('#root').scope();  
+  var selectedEntity;
+  var nodeIsSelected = false; // false: linkIsSelected, true: node is selected
+
+
   var node1 = graph.addNode("Cause", 50, 40);
   var node2 = graph.addNode("Effect", 70, 60);
 
@@ -46,22 +86,43 @@ function editor(graph) {
   // graph.selection.addNodeMode = true;
 
   graph.dispatch = d3.dispatch("canvasMouseDown", "nodeMouseDown", "linkMouseDown");
+  
   graph.dispatch.on("canvasMouseDown", function(point){
-    
-    
-      graph.addNode("", point[0], point[1] );
-    // if( graph.selection.addNodeMode ) {
-    //   var point = d3.mouse(this);
-    //   // selection.addNodeMode = false;
-    // }
+  
+    selectedEntity = graph.addNode("", point[0], point[1] );
+    nodeIsSelected = true;
   })
-  .on("nodeMouseDown", function(){
-    console.log("node clicked");
+  .on("nodeMouseDown", function(node){
+    console.log("node clicked:" + node.id);
+    nodeIsSelected = true;
+    selectedEntity = node;
+
+    scope.attributes.name = selectedEntity.name;
+    scope.apply();
   })
-  .on("linkMouseDown", function(){
-    console.log("link clicked");
+  .on("linkMouseDown", function(link){
+    console.log("link clicked"+ link.id);
+    nodeIsSelected = false;
+    selectedEntity = link;
+
+    scope.attributes.name = selectedEntity.name;
+    scope.apply();
   })
-  //select nodes and add selection behavior
+  
+  this.refresh = function(attributes) {
+    console.log("changing");
+
+    if( nodeIsSelected )
+    {
+      graph.removeNode(selectedEntity.id);
+      graph.addNode(scope.attributes.name, selectedEntity.x, selectedEntity.y, selectedEntity.id );
+    }
+    else
+    {
+      graph.removeLink(selectedEntity.id);
+      graph.addLink( selectedEntity.source, selectedEntity.target, scope.attributes.name, selectedEntity.id );
+    }
+  }
 }
 
 function myGraph(rootElement, width, height) {
@@ -72,10 +133,10 @@ function myGraph(rootElement, width, height) {
   var nodeCount = this.nodeCount = 0;
 
   // Add and remove elements on the graph object
-  this.addNode = function (name, x, y) {
+  this.addNode = function (name, x, y, id) {
     x = x;
     y = y;
-    var id = " " + (++nodeCount);
+    id = id || (" " + (++nodeCount));
     
     name = name || (" ");
     var node = {
@@ -102,14 +163,18 @@ function myGraph(rootElement, width, height) {
         else i++;
       }
 
+      nodeCount--;
+
       nodes.splice(findNodeIndex(id),1);
       update();
   }
 
-  this.addLink = function (sourceID, targetID, linkID) {
+  this.addLink = function (sourceID, targetID, name, linkID) {
+      name = name || " ";
       var link = {
         "source":sourceID,
         "target":targetID,
+        "name": name,
         "id": linkID,
         "fixed": true
       };
@@ -171,15 +236,21 @@ function myGraph(rootElement, width, height) {
 
     var linkEnter = link.enter().append("line")
         .attr("class", "link")
+        .attr("id", function(d) {
+          return "link_ "+d.id;
+        })
         .on('mousedown', function(){
           d3.event.stopPropagation();  
-          _self.dispatch.linkMouseDown();
+          _self.dispatch.linkMouseDown(d);
         })
 
     linkEnter.append("text")
         .attr("class", "linktext")
         .attr("dx", ".35em")
         .attr("dy", 80)
+        .attr("id", function(d) {
+          return "link_text_ "+d.id;
+        })
         .text(function(d) {
           return d.id;
         });
@@ -193,9 +264,12 @@ function myGraph(rootElement, width, height) {
 
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
-        .on('mousedown', function(){
+        .attr("id", function(d) {
+          return "node_ "+d.id;
+        })
+        .on('mousedown', function(d){
           d3.event.stopPropagation();  
-          _self.dispatch.nodeMouseDown();
+          _self.dispatch.nodeMouseDown(d);
         })
         .call(drag);
 
@@ -211,6 +285,9 @@ function myGraph(rootElement, width, height) {
         .attr("class", "nodetext")
         .attr("dx", ".35em")
         .attr("dy", 80)
+        .attr("id", function(d) {
+          return "node_text_ "+d.id;
+        })
         .text(function(d) {
           return d.name;
         });
