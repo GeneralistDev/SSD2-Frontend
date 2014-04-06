@@ -4,7 +4,12 @@ angular.module('frontendApp', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
-  'ngRoute'
+  'ngRoute',
+  'frontendApp.directives.attributesPanel',
+  'frontendApp.directives.w2uiLayout',
+  'frontendApp.directives.editorGraphPanel',
+  'frontendApp.directives.paletPanel',
+  'frontendApp.directives.dslPanel'
 ])
   .config(function ($routeProvider) {
     $routeProvider
