@@ -5,6 +5,7 @@ angular.module('frontendApp', [
   'ngResource',
   'ngSanitize',
   'ngRoute',
+  'frontendApp.services.dummy',
   'frontendApp.directives.attributesPanel',
   'frontendApp.directives.w2uiLayout',
   'frontendApp.directives.editorGraphPanel',

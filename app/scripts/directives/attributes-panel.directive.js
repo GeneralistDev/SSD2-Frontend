@@ -1,7 +1,7 @@
 'use strict';
  
 var app = angular.module('frontendApp.directives.attributesPanel', [])
-  .directive('attributesPanel', function($compile) {
+  .directive('attributesPanel', function($compile, $rootScope, dummy) {
 	return {
 		restrict : 'A',
 		// replace: true,
@@ -18,7 +18,10 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
     	};
 
 	    $scope.attributesChangeHandler = function() {
-	      console.log("attributesChangeHandler");
+      		console.log("attributesChangeHandler from attributes panel");
+      		// $rootScope.$broadcast('fred', $scope.attributes.name);
+
+      		dummy.setName($scope.attributes.name);
 	      // editorOb.refresh();
 	      //TODO: update editor view
 	    };

@@ -11,11 +11,11 @@ var app = angular.module('frontendApp.directives.w2uiLayout', [])
 	}
 
 	function controller($scope, $element, $timeout) {
-    	$timeout(function() {
-    		//recompiles all of the panel directives 
-    		$compile($element.contents())($scope);
-        	$scope.$apply();
-    	});
+    	// $timeout(function() {
+    	// 	//recompiles all of the panel directives 
+    	// 	$compile($element.contents())($scope);
+     //    	$scope.$apply();
+    	// });
 	}
 
 	function link(scope, element, attrs){

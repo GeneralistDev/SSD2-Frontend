@@ -19,6 +19,7 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
 		
 		$scope.$on('$routeChangeSuccess', function() {
     		//TODO: fix so that this is not hard coded
+    		//TODO: move the graph initialization to the link
     		var editorGraph = new myGraph("#layout_layout_panel_main > div.w2ui-panel-content", 1500, 1500);
 			var editorOb = new editor(editorGraph);
     		var node1 = editorGraph.addNode("Cause", 50, 40);
