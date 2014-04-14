@@ -4,17 +4,18 @@
 //See http://kirkbushell.me/when-to-use-directives-controllers-or-services-in-angular/
 
 //Singleton
-var app = angular.module('frontendApp.services.dummy', [])
-  .service('dummy', function($rootScope) {
+var app = angular.module('frontendApp.services.dummyHTTP', [])
+  .service('dummyHTTP', function($http) {
   	
   	this.attributes= {
 		name : '...'
   	};
 
-  	this.attributesNameUpdateEvent = function() {
-		return "dummy.attributes.name.update";
-		//To listen to this event use $scope.$on(dummy.attributesNameUpdateEvent(),
-			// function(event) {...});
+  	this.getDummy = function(callback) {
+  		//authentication code here
+		$http.get("/url").success(function(data){
+			callback(data);
+		});
 	}
 
   	//use to fire the event

@@ -6,6 +6,7 @@ angular.module('frontendApp', [
   'ngSanitize',
   'ngRoute',
   'frontendApp.services.dummy',
+  'frontendApp.services.dummyHTTP',
   'frontendApp.directives.attributesPanel',
   'frontendApp.directives.w2uiLayout',
   'frontendApp.directives.editorGraphPanel',
