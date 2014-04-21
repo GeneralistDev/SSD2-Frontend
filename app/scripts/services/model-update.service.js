@@ -5,7 +5,7 @@
 
 //Singleton
 var app = angular.module('frontendApp.services.modelUpdate', [])
-  .service('modelUpdate', function($http) {
+  .service('modelUpdate', function(raptideAPIHTTP) {
   	
   	this.attributes= {
 		name : '...'

@@ -1,10 +1,10 @@
 'use strict';
  
 var app = angular.module('frontendApp.directives.attributesPanel', [])
-  .directive('attributesPanel', function($compile, $rootScope, dummy) {
+  .directive('attributesPanel', function($compile, $rootScope, dummy, attributesContext) {
 	return {
 		restrict : 'A',
-		// replace: true,
+	     // replace: true,
 		scope : {},
 		templateUrl : 'views/attributes-panel.html',
 		compile : compile,
@@ -13,17 +13,46 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
 	}
 
 	function controller($scope, $element, $timeout) {
-	    $scope.attributes = {
-      		name: "..."
-    	};
+	    
+	    // Attribute values that are bound to the attributes form
+	    // $scope.attributes = {
+     //  		name: "..."
+    	// };
+
+
+    	// Entity that is currently selected
+    	$scope.context= {
+	  		entity : {
+	  			attributes : {
+      				name: "..."
+    			}},
+	  		entityIsNode : true
+  		};
+
+    	
+    	// Handles context changed event (new selection is made in graph).
+    	// Updates local context.
+		$scope.$on(attributesContext.contextChangedEvent(), function(event) {
+
+		    $scope.context = attributesContext.context;
+
+		    $timeout(function() {
+				$scope.apply();
+			});
+	    });
+
+	    // $rootScope.apply();
 
 	    $scope.attributesChangeHandler = function() {
       		console.log("attributesChangeHandler from attributes panel");
       		// $rootScope.$broadcast('fred', $scope.attributes.name);
 
-      		dummy.setName($scope.attributes.name);
-	      // editorOb.refresh();
-	      //TODO: update editor view
+      		dummy.setName($scope.context.entity.attributes.name);
+
+      		// $scope.context.entity.attributes = $scope.attributes;
+      		attributesContext.updateAttributes($scope.context.entity, $scope.context.entity.entityIsNode );
+
+      		$scope.context = attributesContext.context; 
 	    };
 
     	console.log("hello attributes controller");

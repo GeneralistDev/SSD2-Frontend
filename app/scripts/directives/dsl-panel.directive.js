@@ -1,7 +1,7 @@
 'use strict';
  
 var app = angular.module('frontendApp.directives.dslPanel', [])
-  .directive('dslPanel', function($compile, dummy) {
+  .directive('dslPanel', function($compile, dummy, raptideAPIHTTP) {
 	return {
 		restrict : 'A',
 		replace: true,
@@ -16,13 +16,29 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 		$scope.data = "this is the dsl panel";
     	console.log("hello dsl controller");
 
-    	$scope.$on(dummy.attributesNameUpdateEvent(), function(event) {
-    		$scope.data = dummy.attributes.name;
-    	})
-    	// $scope.$on('fred', function(event, data) {
-    	// 	// console.log(data);
-    	// 	$scope.data = data;
+
+    	// $scope.$on(raptideAPIHTTP.PutModelOkEvent(), function(event) {
+    	// 	//request dsl update from server
+    	// 	raptideAPIHTTP.getDSL(function(data) {
+    	// 		$scope.data = data;
+    	// 	});
     	// });
+
+		raptideAPIHTTP.getDSL(function(data) {
+			$scope.data = data;
+		});
+		
+  //   	raptideAPIHTTP.getDSL(function(data) {
+  //   			$scope.data = data;
+		// });
+  
+		$scope.$on(dummy.attributesNameUpdateEvent(), function(event) {
+		    $scope.data = dummy.attributes.name;
+
+		    raptideAPIHTTP.getDSL(function(data) {
+				$scope.data = data;
+			});
+	    });
 	}
 
 	function link(scope, element, attrs) {

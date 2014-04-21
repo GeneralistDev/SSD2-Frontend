@@ -12,6 +12,29 @@ function myGraph(rootElement, width, height) {
   var nodeImageProperties = nodeImageProperties = {};
   var nodeTextProperties = nodeTextProperties = {};
 
+  // Strips out the nodes and links visual data. 
+  this.getData = function() {
+    var pNodes = [];
+    var pLinks = [];
+
+    for( var i = 0; i < nodes.length; i++) {
+      pNodes.push({ id : nodes[i].id,
+                    nodeType : nodes[i].nodeType,
+                    attributes : nodes[i].attributes
+                  });
+    }
+
+    for( var j = 0; j < links.length; j++) {
+      pLinks.push( { id : links[j].id,
+                     linkType : links[j].linkType,
+                     attributes : links[j].attributes,
+                     sourceID : links[j].sourceID,
+                     targetID : links[j].targetID  
+      });
+    }
+
+    return {nodes : pNodes, links : pLinks}
+  }
   // Add and remove elements on the graph object
   this.addNode = function (x, y, attributes, nodeType, id) {
     x = x;
@@ -38,7 +61,8 @@ function myGraph(rootElement, width, height) {
         "imagePath" : visualProperites.imageProperties.imagePath, 
         "imageWidth" : visualProperites.imageProperties.width, 
         "imageHeight" : visualProperites.imageProperties.height, 
-        "textValue" : visualProperites.textProperties.textValue
+        "textValue" : visualProperites.textProperties.textValue,
+        "links" : []
       };
 
     nodes.push(node);
@@ -51,26 +75,27 @@ function myGraph(rootElement, width, height) {
     var i = 0;
     var nodeToRemove = findNode(id);
     var endPoint;
+    console.log(nodeToRemove);
 
     // Searches and replaces node with blank end point if node to delete is not an end point already
     if(nodeToRemove.nodeType !== "disconnected-link-node" ) {
 
-      // Looks for node connected to link
-      for(var i = 0; i < links.length; i++) {
-        if ((links[i]['source']) == nodeToRemove) {
+      // Looks for link connected to node.
+      for(var i = 0; i < nodeToRemove.links.length; i++) {
 
+        if ((nodeToRemove.links[i]['source']) === nodeToRemove) {
           // Adds new blank node end point
           endPoint = _self.addNode(nodeToRemove.x,nodeToRemove.y, "", "disconnected-link-node" );
-          joinLinkToNode(links[i], endPoint, false );
-          break;
+          _self.joinLinkToNode(links[i], endPoint, false );
         }
-        else if((links[i]['target']) == nodeToRemove) {
+
+        if ((nodeToRemove.links[i]['source']) === nodeToRemove) {
           endPoint = _self.addNode(nodeToRemove.x,nodeToRemove.y, "", "disconnected-link-node" );
-          joinLinkToNode(links[i], endPoint, true );
-          break;
+          _self.joinLinkToNode(links[i], endPoint, true );
         }
       }
     }
+
     nodeCount--;
 
     nodes.splice(findNodeIndex(id),1); //removes old node
@@ -82,11 +107,14 @@ function myGraph(rootElement, width, height) {
 
     // Remove (unnecisary) end points if any 
     if(linkToRemove['source'].nodeType === "disconnected-link-node" ) {
-      _self.removeNode(linkToRemove['source']);
+      _self.removeNode(linkToRemove['source'].id);
+      // nodeCount--;
+
+      // nodes.splice(findNodeIndex(id),1); //removes old node
     }
 
     if(linkToRemove['target'].nodeType === "disconnected-link-node" ) {
-      _self.removeNode(linkToRemove['target']); 
+      _self.removeNode(linkToRemove['target'].id); 
     }
 
     linkCount--;
@@ -112,6 +140,14 @@ function myGraph(rootElement, width, height) {
       };
 
       links.push(link);
+
+      // for( var i = 0; i < source.links.length; i++) {
+      //   if(source.links[i] === )
+      //   source.links.push(link);
+      // }
+
+      source.links.push(link);
+      target.links.push(link);
       
       update();
 
@@ -138,33 +174,96 @@ function myGraph(rootElement, width, height) {
     target.isSource = true;
 
     var newLink = _self.addLink(source, target, attributes, linkType, linkID);  
-    source.link = newLink;
-    target.link = newLink;
+    // source.link = newLink;
+    // target.link = newLink;
+
+    return newLink;
   }
 
-  this.joinLinkToNode = function (link, nodeToJoin, isTarget) {
+  this.join = function(link, nodeToJoin, isTarget ) {
+    
+    var nodeToDisconnect;
 
-    var nodeToRemove;
+    if(isTarget === true ) {
+      nodeToDisconnect = link.target;
 
-    if(isTarget === true) {
-      _self.removeNode(link.target.id);
       link.target = nodeToJoin;
       link.targetID = nodeToJoin.id;
     }
     else {
-      _self.removeNode(link.source.id); //bug node not deleting
+      nodeToDisconnect = link.source;
+
+      link.source = nodeToJoin;
+      link.sourceID = nodeToJoin.id;
+    }
+
+    // for( var i = 0; i <  nodeToDisconnect.links.length; i++) {
+    //   if( nodeToDisconnect.links[i] === link ) {
+    //     nodeToDisconnect.links.splice(i, 1);
+    //   }
+    // }
+    
+    nodeToDisconnect.links.splice()
+
+    _self.refreshLink(link);
+
+    return link;
+  }
+
+  // Removes old node
+  this.joinLinkToNode = function (link, nodeToJoin, isTarget) {
+
+    var nodeToRemove;
+    // nodeToJoin.links.
+
+    if(isTarget === true) {
+
+      nodeToRemove = link.target;
+
+      link.target = nodeToJoin;
+      link.targetID = nodeToJoin.id;
+    } else {
+      nodeToRemove = link.source;
+
       link.source = nodeToJoin;
       link.sourceID = nodeToJoin.id;
     }   
 
+    if(nodeToRemove.nodeType === "disconnected-link-node" ) {
+      nodeCount--;
+      nodes.splice(findNodeIndex(nodeToRemove.id),1);
+    } //removes old node
+    // } else { //remove link entry from disconnected node
+    //   for( var i = 0; i <  nodeToRemove.links.length; i++) {
+    //     if( nodeToRemove.links[i] === link ) {
+    //       nodeToRemove.links.splice(i, 1);
+    //     }
+    //   }
+    // }
 
-    removeLink(link.id);
-    
-    update();
-    addLink(link.source, link.target, link.attributes, link.linkType, link.id);
-    update();
+    _self.refreshLink(link);
 
     return link;
+  }
+
+  // Refreshes the node visuals
+  this.refreshNode = function(node) {
+    nodeCount--;
+    nodes.splice(findNodeIndex(node.id),1);
+    update();
+    
+    _self.addNode(node.x, node.y, node.attributes, node.nodeType, node.id);
+    update();
+  }
+
+  // Refreshes link visuals
+  this.refreshLink = function(link) {
+    linkCount--;
+    links.splice(findLinkIndex(link.id),1);
+    update();
+    
+    _self.addLink(link.source, link.target, link.attributes, link.linkType, link.id);
+    update();
   }
 
   var findNode = function(id) {
@@ -191,6 +290,10 @@ function myGraph(rootElement, width, height) {
 
   var findNodeIndex = function(id) {
       for (var i in nodes) {if (nodes[i]["id"] === id) return i};
+  }
+
+  var findLinkIndex = function(id) {
+      for (var i in links) {if (links[i]["id"] === id) return i};
   }
 
   this.getWidth = function(){
@@ -267,6 +370,12 @@ function myGraph(rootElement, width, height) {
         //stop showing browser menu
         // d3.event.preventDefault();
       });
+
+  d3.select("body")
+    .on("keydown", function() {
+      if(d3.event.keyCode === 46) //delete key 
+        _self.dispatch.canvasDeleteKeyDown();
+    });
 
   var force = d3.layout.force()
       .gravity(.05)

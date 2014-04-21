@@ -4,7 +4,7 @@
 //requires editor.util.js import
 
 var app = angular.module('frontendApp.directives.editorGraphPanel', [])
-  .directive('editorGraphPanel', function($compile, modelUpdate) {
+  .directive('editorGraphPanel', function($compile, attributesContext) {
   	var elem;
 	return {
 		restrict : 'A',
@@ -17,17 +17,30 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
 	function controller($scope, $element, $timeout) {
   	console.log("hello editor controller");
 		
-    //
+    // $scope.$on(attributesContext.updateElement(), function(event) {
+    //     //editorGraph.updateElement(attributesContext.element, attributesContext.isNode);
+    // });
+
+    var editorGraph, 
+        editorOb;
 
 		$scope.$on('$routeChangeSuccess', function() {
     		//TODO: fix so that this is not hard coded
     		//TODO: move the graph initialization to the link
-    		var editorGraph = new myGraph("#layout_layout_panel_main > div.w2ui-panel-content", 1500, 1500);
-			  var editorOb = new editor(editorGraph);
+    		editorGraph = new myGraph("#layout_layout_panel_main > div.w2ui-panel-content", 1500, 1500);
+			  editorOb = new editor(editorGraph, attributesContext);
     	// 	var node1 = editorGraph.addNode("Cause", 50, 40);
   			// var node2 = editorGraph.addNode("Effect", 70, 60);
     	});
-  	
+
+    //Updates the nodes and links on entity update event.
+    $scope.$on(attributesContext.updateAttributesEvent(), function(event) {
+        if(attributesContext.context.isNode)
+          editorGraph.refreshNode(attributesContext.context.entity);
+        else {
+          editorGraph.refreshLink(attributesContext.context.entity);
+        }
+    });
 	}
 
 	function link(scope, element, attrs) {
@@ -38,22 +51,25 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
   });
 
 
-function editor(graph) {  
+function editor(graph, attributesContext) {  
   // var scope = angular.element('#root').scope();  
+  // console.log(dummy.setName("fred"));
+
+  graph.dispatch = d3.dispatch("canvasMouseDown", "canvasRightClick", 
+                    "nodeMouseDown", "nodeMouseUp", "nodeDoubleClick", "linkMouseDown",
+                    "canvasDeleteKeyDown");
+
+  var _self = this;
   var selectedEntity;
   var previouseSelectedEntity;
   var nodeIsSelected = false; // false: linkIsSelected, true: node is selected
   var nodeIsBeingDragged = false;
 
-  var node1 = graph.addNode( 50, 40, "Cause");
-  var node2 = graph.addNode(70, 60, "Effect");
-
-  // graph.addLink(node1, node2, { name: "fred"});
-  graph.addLink(node1, node2);
+  
   // graph.selection.addNodeMode = true;
 
-  graph.dispatch = d3.dispatch("canvasMouseDown", "canvasRightClick", 
-                    "nodeMouseDown", "nodeMouseUp", "nodeDoubleClick", "linkMouseDown");
+  // graph.dispatch = d3.dispatch("canvasMouseDown", "canvasRightClick", 
+  //                   "nodeMouseDown", "nodeMouseUp", "nodeDoubleClick", "linkMouseDown");
   
   graph.dispatch
   .on("canvasMouseDown", function(point) {
@@ -73,6 +89,9 @@ function editor(graph) {
   })
   .on("linkMouseDown", function(link) {
     linkMouseDown(link);
+  })
+  .on("canvasDeleteKeyDown", function(){
+    canvasDeleteKeyDown();
   });
 
   // Handles mouse down on canvas event.
@@ -80,6 +99,8 @@ function editor(graph) {
   var canvasMouseDown = function(point) {
     selectedEntity = graph.addNode(point[0], point[1] );
     nodeIsSelected = true;
+
+    attributesContext.changeContext(selectedEntity, nodeIsSelected );
   }
 
   // Handles right click on canvas event.
@@ -87,6 +108,8 @@ function editor(graph) {
   var canvasRightClick = function(point) {
     selectedEntity = graph.addDisconnectedLink(point[0], point[1] );
     nodeIsSelected = false;
+
+    attributesContext.changeContext(selectedEntity, nodeIsSelected );
   }
 
   // Handles mouse down on node event.
@@ -113,6 +136,10 @@ function editor(graph) {
     nodeIsBeingDragged = true;
 
     selectedEntity = node;
+
+    attributesContext.changeContext(selectedEntity, nodeIsSelected );
+
+
 
     // console.log("node nodeMouseDown:" +node.id);
     // console.log("selectedEntity nodeMouseDown:" + selectedEntity.id);
@@ -147,11 +174,12 @@ function editor(graph) {
     //is previouse entity different
     //is prev entity discon end point
 
-    if( previouseSelectedEntity !== node && 
-      (previouseSelectedEntity.nodeType === "disconnected-link-node" )) {
-      
-      console.log("join node ep: " + previouseSelectedEntity.id);
-      graph.joinLinkToNode(previouseSelectedEntity.link, node, previouseSelectedEntity.isTarget );
+    if( previouseSelectedEntity !== node ) {
+        if(previouseSelectedEntity.nodeType === "disconnected-link-node" ) { //error assumes previousely selected entity is a node
+        
+        console.log("join node ep: " + previouseSelectedEntity.id);
+        graph.joinLinkToNode(previouseSelectedEntity.link, node, previouseSelectedEntity.isTarget );
+      }
     }
   }
 
@@ -163,8 +191,32 @@ function editor(graph) {
     nodeIsSelected = false;
     selectedEntity = link;
 
+    attributesContext.changeContext(selectedEntity, nodeIsSelected );
+
     // scope.attributes.name = selectedEntity.name;
     // scope.apply();
+  }
+
+  var canvasDeleteKeyDown = function() {
+    console.log("Key pressed!");
+
+    if((typeof selectedEntity !== "undefined") && 
+      (typeof nodeIsSelected !== "undefined") ) {
+
+      if(nodeIsSelected) {
+        if( selectedEntity.nodeType !== "disconnected-link-node" ) {
+          graph.removeNode(selectedEntity.id);
+          console.log("deleting node");
+        }
+        else {
+          console.log("tried to delete disconnected-link-node");
+        }
+      }
+      else {
+        graph.removeLink(selectedEntity.id);
+        console.log("deleting link");
+      }
+    }
   }
 
   
@@ -182,4 +234,54 @@ function editor(graph) {
   //     graph.addLink( selectedEntity.source, selectedEntity.target, scope.attributes.name, selectedEntity.id );
   //   }
   // }
+
+  var demo1 = function() {
+    var fredNode = graph.addNode( 50, 40, {name : "Fred"}, "person");
+    var barneyNode = graph.addNode(100, 40, {name : "Barney"}, "person");
+
+    var margeNode = graph.addNode( 50, 100, {name : "Marge"}, "person");
+    var richardNode = graph.addNode(100, 100, {name : "Richard"}, "person");
+
+    graph.addLink(fredNode, barneyNode, { name: "mates"});
+    graph.addLink(margeNode, richardNode, {name: "married"});
+  }
+
+  var demo2 = function() {
+    var fredNode = graph.addNode( 50, 40, {name : "Fred"}, "person");
+    var barneyNode = graph.addNode(100, 40, {name : "Barney"}, "person");
+
+    graph.addLink(fredNode, barneyNode, { name: "mates"});
+    graph.addDisconnectedLink(200, 300, {name : "associates"});
+
+
+    var link = graph.addDisconnectedLink(400, 300, {name : "cohorts"});
+    graph.joinLinkToNode(link, barneyNode, false);
+  }
+
+  var demo3 = function() {
+    var markusNode = graph.addNode( 50, 40, {name : "Markus Lumpe"}, "person");
+    var cPlusPLusNode = graph.addNode(100, 40, {name : "C++"}, "person");
+    var cSharpDevTeam = graph.addNode(100, 40, {name : "C# dev team"}, "person");
+
+    var danielParkerNode = graph.addNode(100, 40, {name : "Daniel Parker"}, "person");
+    var coffeeNode = graph.addNode(100, 40, {name : "Coffee"}, "person");
+
+    graph.addLink(markusNode, cPlusPLusNode, { name: "Best of Friends"});
+
+    graph.addLink(danielParkerNode, coffeeNode, { name: "Loves"});
+    graph.addLink(markusNode, cSharpDevTeam, { name: "Enemies"});
+    graph.removeNode(danielParkerNode.id);
+    var link = graph.addDisconnectedLink(400, 300, {name : "cohorts"});
+    graph.joinLinkToNode(link, markusNode, false);
+  }
+
+  // demo1();
+  // demo2();
+ 
+  demo3();
+
+  var data = graph.getData();
+
+  console.log("data:");
+  console.log(JSON.stringify(data));
 }
