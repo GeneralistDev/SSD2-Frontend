@@ -35,6 +35,7 @@ function myGraph(rootElement, width, height) {
 
     return {nodes : pNodes, links : pLinks}
   }
+
   // Add and remove elements on the graph object
   this.addNode = function (x, y, attributes, nodeType, id) {
     x = x;
@@ -62,7 +63,6 @@ function myGraph(rootElement, width, height) {
         "imageWidth" : visualProperites.imageProperties.width, 
         "imageHeight" : visualProperites.imageProperties.height, 
         "textValue" : visualProperites.textProperties.textValue,
-        "links" : []
       };
 
     nodes.push(node);
@@ -77,23 +77,11 @@ function myGraph(rootElement, width, height) {
     var endPoint;
     console.log(nodeToRemove);
 
-    // Searches and replaces node with blank end point if node to delete is not an end point already
-    if(nodeToRemove.nodeType !== "disconnected-link-node" ) {
+    var associatedLinks = findLinks("", nodeToRemove.id );
+    
+    for(var i in associatedLinks) {
 
-      // Looks for link connected to node.
-      for(var i = 0; i < nodeToRemove.links.length; i++) {
-
-        if ((nodeToRemove.links[i]['source']) === nodeToRemove) {
-          // Adds new blank node end point
-          endPoint = _self.addNode(nodeToRemove.x,nodeToRemove.y, "", "disconnected-link-node" );
-          _self.joinLinkToNode(links[i], endPoint, false );
-        }
-
-        if ((nodeToRemove.links[i]['source']) === nodeToRemove) {
-          endPoint = _self.addNode(nodeToRemove.x,nodeToRemove.y, "", "disconnected-link-node" );
-          _self.joinLinkToNode(links[i], endPoint, true );
-        }
-      }
+      _self.removeLink(associatedLinks[i].id);
     }
 
     nodeCount--;
@@ -103,23 +91,11 @@ function myGraph(rootElement, width, height) {
   }
 
   this.removeLink = function (id) {
-    var linkToRemove = findLink(id);
-
-    // Remove (unnecisary) end points if any 
-    if(linkToRemove['source'].nodeType === "disconnected-link-node" ) {
-      _self.removeNode(linkToRemove['source'].id);
-      // nodeCount--;
-
-      // nodes.splice(findNodeIndex(id),1); //removes old node
-    }
-
-    if(linkToRemove['target'].nodeType === "disconnected-link-node" ) {
-      _self.removeNode(linkToRemove['target'].id); 
-    }
 
     linkCount--;
-
+    console.log("removing link with id:" + id);
     links.splice(findLinkIndex(id),1);
+
     update();
   }
 
@@ -140,20 +116,13 @@ function myGraph(rootElement, width, height) {
       };
 
       links.push(link);
-
-      // for( var i = 0; i < source.links.length; i++) {
-      //   if(source.links[i] === )
-      //   source.links.push(link);
-      // }
-
-      source.links.push(link);
-      target.links.push(link);
       
       update();
 
       return link;
   }
 
+  // Experimental code. Do not use.
   // Adds a link that is not connected to any formally declared nodes.
   // This is achieved by creating two special end point nodes that are not
   // visible(and are not considered in the model) so that the link can be 
@@ -174,98 +143,62 @@ function myGraph(rootElement, width, height) {
     target.isSource = true;
 
     var newLink = _self.addLink(source, target, attributes, linkType, linkID);  
-    // source.link = newLink;
-    // target.link = newLink;
 
     return newLink;
   }
 
-  this.join = function(link, nodeToJoin, isTarget ) {
-    
-    var nodeToDisconnect;
-
-    if(isTarget === true ) {
-      nodeToDisconnect = link.target;
-
-      link.target = nodeToJoin;
-      link.targetID = nodeToJoin.id;
-    }
-    else {
-      nodeToDisconnect = link.source;
-
-      link.source = nodeToJoin;
-      link.sourceID = nodeToJoin.id;
-    }
-
-    // for( var i = 0; i <  nodeToDisconnect.links.length; i++) {
-    //   if( nodeToDisconnect.links[i] === link ) {
-    //     nodeToDisconnect.links.splice(i, 1);
-    //   }
-    // }
-    
-    nodeToDisconnect.links.splice()
-
-    _self.refreshLink(link);
-
-    return link;
-  }
-
+  // Experimental code. Do not use.
   // Removes old node
   this.joinLinkToNode = function (link, nodeToJoin, isTarget) {
 
-    var nodeToRemove;
-    // nodeToJoin.links.
-
     if(isTarget === true) {
-
-      nodeToRemove = link.target;
 
       link.target = nodeToJoin;
       link.targetID = nodeToJoin.id;
     } else {
-      nodeToRemove = link.source;
 
       link.source = nodeToJoin;
       link.sourceID = nodeToJoin.id;
     }   
 
-    if(nodeToRemove.nodeType === "disconnected-link-node" ) {
-      nodeCount--;
-      nodes.splice(findNodeIndex(nodeToRemove.id),1);
-    } //removes old node
-    // } else { //remove link entry from disconnected node
-    //   for( var i = 0; i <  nodeToRemove.links.length; i++) {
-    //     if( nodeToRemove.links[i] === link ) {
-    //       nodeToRemove.links.splice(i, 1);
-    //     }
-    //   }
-    // }
+    // _self.refreshLink(link);
 
-    _self.refreshLink(link);
-
-    return link;
-  }
-
-  // Refreshes the node visuals
-  this.refreshNode = function(node) {
-    nodeCount--;
-    nodes.splice(findNodeIndex(node.id),1);
-    update();
-    
-    _self.addNode(node.x, node.y, node.attributes, node.nodeType, node.id);
-    update();
-  }
-
-  // Refreshes link visuals
-  this.refreshLink = function(link) {
     linkCount--;
     links.splice(findLinkIndex(link.id),1);
     update();
     
     _self.addLink(link.source, link.target, link.attributes, link.linkType, link.id);
     update();
+
+    return link;
   }
 
+  // Refreshes the node visuals
+  this.refreshNode = function(node) {
+
+    d3.select("[id='node_text_ " + node.id + "']").text(function() {
+        return node.attributes.name;
+      });
+
+    // Find the visuals
+    // update visuals
+    // nodeCount--;
+    // nodes.splice(findNodeIndex(node.id),1);
+    // update();
+    
+    // _self.addNode(node.x, node.y, node.attributes, node.nodeType, node.id);
+    // update();
+  }
+
+  // Refreshes link visuals
+  this.refreshLink = function(link) {
+    d3.select("[id='link_label_"+ link.id + "']").text(function() {
+        console.log("refreshLink got here!");
+        return link.attributes.name;
+      });
+  }
+
+  // Returns the node for the given nodeID
   var findNode = function(id) {
       for (var i in nodes) {
         if (nodes[i]["id"] === id) 
@@ -273,19 +206,29 @@ function myGraph(rootElement, width, height) {
       };
   }
 
-  var findLink = function(linkID, nodeID) {
+  // Returns a list of links pertaining to the linkID.
+  // Also it provides all the links attatched to a supplied node. 
+  var findLinks = function(linkID, nodeID) {
+    var plinks = [];
     if( typeof linkID !== undefined ){
       for (var i in links) {
-        if (links[i]["id"] === linkID) 
-          return links[i];
+        if (links[i]["id"] === linkID) {
+          links.push(links[i]);
+          break;
+        }
       };
     }
-    else if(typeof nodeID !== undefined ) {
+    
+    // Searches for any links that are associated with the nodeID.
+    if(typeof nodeID !== undefined ) {
       for (var i in links) {
-        if ((links[i]["source"] === nodeID) || (links[i]["target"] === nodeID))
-          return links[i];
+        if ((links[i].sourceID === nodeID) || (links[i].targetID === nodeID)) {
+          plinks.push(links[i]);
+        }
       };
     }
+
+    return plinks;
   }
 
   var findNodeIndex = function(id) {
@@ -431,6 +374,9 @@ function myGraph(rootElement, width, height) {
         })
         .append("text")
         .attr("class", "link-label")
+        .attr("id", function(d) {
+          return "link_label_"+d.id;
+        })
         .attr("dx", 1)
         .attr("dy", "1em")
         .attr("text-anchor", "middle")
@@ -457,13 +403,16 @@ function myGraph(rootElement, width, height) {
         .attr("id", function(d) {
           return "node_ "+d.id;
         })
-        .on("dblclick", function(d) {
-           _self.dispatch.nodeDoubleClick(d);
-        })
         .on('mousedown', function(d){
           d3.event.stopPropagation();  
-          _self.dispatch.nodeMouseDown(d);
-        })
+        
+          d3.event.preventDefault();
+
+          if(d3.event.which == 1) //left mouse button id
+            _self.dispatch.nodeMouseDown(d);
+          else if(d3.event.which == 3)  //right mouse button id
+            _self.dispatch.nodeRightClick(d);
+          })
         .on('mouseup', function(d){
           // d3.event.stopPropagation();  
           _self.dispatch.nodeMouseUp(d);

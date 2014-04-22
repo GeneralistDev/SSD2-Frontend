@@ -31,12 +31,19 @@ var app = angular.module('frontendApp.services.attributesContext', [])
       console.log("CHanged context:");
       console.log(JSON.stringify(selectedEntity.attributes));
   		this.context.entity = selectedEntity;
-  		this.context.entity.entityIsNode = isNode;
-
-
+  		this.context.entityIsNode = isNode;
 
   		$rootScope.$broadcast(this.contextChangedEvent());
 	  }
+
+    // Changes the attributes context to no context mode. This is typically called after an entity
+    // has beenr removed. This ensures that any previousely deleted entity are not unintentionally 
+    // resurected. 
+    this.changeToNoContext = function() {
+      this.context.entity = {};
+
+      $rootScope.$broadcast(this.contextChangedEvent());
+    }
 
     //called by the attributes panel
     this.updateAttributes = function( updatedEntity, isNode) {

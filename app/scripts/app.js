@@ -7,6 +7,7 @@ angular.module('frontendApp', [
   'ngRoute',
   'frontendApp.services.dummy',
   'frontendApp.services.attributesContext',
+  'frontendApp.services.modelUpdater',
   'frontendApp.services.raptideAPIHTTP',
   'frontendApp.directives.attributesPanel',
   'frontendApp.directives.w2uiLayout',
