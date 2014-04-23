@@ -16,59 +16,44 @@ var app = angular.module('frontendApp.services.modelUpdater', [])
 		this.periodicalUpdate = function(delay){
 		    $timeout(function() {
 
-			    if( delay >= (delayTime * 20)) {
-			    	delay = delayTime;
-			    	console.log("PeriodicalUpdate delay cap reached");
-			    } else {
-			    	delay = delay + delay / 2;
-			    }
-
 		    	if(delayRequired === true) {
 		    		delayRequired = false;
-		    		console.log("Update delayed for " + delay + " ms");
+		    		// console.log("Update delayed for " + delay + " ms");
 		    		_self.periodicalUpdate(delay);
 		    	} else {
-		    		updateRequired = false;
 
-		    		try {
-		    			if(raptideAPIHTTP.vismodelid === "") { 
+	    			if(raptideAPIHTTP.vismodelid === "") { 
 
-		    				raptideAPIHTTP.postVisualModel(_self.visualModel, function(data) { // On Success
+	    				raptideAPIHTTP.postVisualModel(_self.visualModel, function(data) { // On Success
+		    			//TODO: handle success callback.
+		    				updateRequired = false;
+		    			}, 
+		    			function(data, status) { // On Error
+		    				// console.log("Next update attempt scheduled in " + delay + " ms");
+		    				//TODO: Alert on fatal errors (any 400, 500)
+				    		_self.periodicalUpdate(delay);
+		    			});
+	    			} else {
+			    		
+			    		raptideAPIHTTP.putVisualModel(_self.visualModel, function(data) { // On Success
 			    			//TODO: handle success callback.
-			    			}, 
-			    			function(data, status) { // On Error
-			    				console.log("Next update attempt scheduled in " + delay + " ms");
-					    		_self.periodicalUpdate(delay);
-			    			});
-		    			} else {
-				    		
-				    		raptideAPIHTTP.putVisualModel(_self.visualModel, function(data) { // On Success
-				    			//TODO: handle success callback.
-				    		}, 
-				    		function(data, status) { // On Error
-			    				console.log("Next update attempt scheduled in " + delay + " ms");
-					    		_self.periodicalUpdate(delay );
-			    			});
-			    		}
-		    		} catch(e) {
-		    			if (e instanceof VisualModelIDException) {
-					        console.log("VisualModelIDException: " + e.message);
-					    } else {
-					        console.log("Unknown exception was handled");
-					    }
-
-					    console.log("Next update attempt scheduled in " + delay + delay / 2 + " ms");
-					    _self.periodicalUpdate(delay + delay / 2);
-    				}
+			    			updateRequired = false;
+			    		}, 
+			    		function(data, status) { // On Error
+		    				// console.log("Next update attempt scheduled in " + delay + " ms");
+		    				//TODO: Alert on fatal errors (any client 400, server 500)
+				    		_self.periodicalUpdate(delay );
+		    			});
+		    		}
 		    	}
-	    	}, delay); //TODO: increase delay based on update frequency
+	    	}, delay);
 	  	};
 
 	  	// Updates the visual model and schedules a periodical update. 
 	  	// This assumes that the model is valid.
 		this.updateVisualModel = function(model) {
 			this.visualModel = model; 
-			console.log("updateVisualModel got here");
+
 			if(updateRequired === true ) {
 				delayRequired = true;
 				// console.log("Delaying update request for " + delayTime + " ms");
