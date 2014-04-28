@@ -43,7 +43,7 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
 	        throw new VisualModelIDException("No visual model id has been set"); 
       	}
 
-    	return this.url + "/apk/" + this.vismodelid;
+    	return url + "jar/" + this.vismodelid;
     }
 
     // DSL directive calls this on PutModelOk event.
@@ -131,7 +131,7 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
                 'Content-Type': 'application/json; charset=utf-8'
               }
       }).success(function(data, status, headers, config){
-              _self.vismodelid = data.id;
+              _self.vismodelid = data;
               
               console.log("POST vismodel request was successful. Key retreved was " + _self.vismodelid);
               successCallback(data);
