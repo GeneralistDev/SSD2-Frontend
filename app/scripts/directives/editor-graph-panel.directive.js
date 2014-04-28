@@ -25,10 +25,11 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
 			  editorOb = new editor(editorGraph, attributesContext, modelUpdater);
 
         $timeout(function() {
-          //Initial call will perform the post visual model request
-          modelUpdater.updateVisualModel({}); //TODO: validate model
+          //TODO: Authenticate session
+          //Initial call will perform the post visual model request after 1ms
+          modelUpdater.updateVisualModel(editorGraph.getData()); //TODO: validate model
         });
-    	});
+    	}, 1000); 
 
     //Updates the nodes and links on entity update event.
     $scope.$on(attributesContext.updateAttributesEvent(), function(event) {

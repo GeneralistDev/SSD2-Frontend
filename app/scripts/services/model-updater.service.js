@@ -9,7 +9,7 @@ var app = angular.module('frontendApp.services.modelUpdater', [])
 
 		var updateRequired = false; // TRUE: update request will be sent at next cycle.
 		var delayRequired = false; // TRUE: update will be delayed until the following cycle.
-		var delayTime = 1000;
+		var delayTime = 1000; //in ms
 
 		// Performs a putVisModel request to the raptide api if an update is required.
 		// If a delay is required it will instead schedule another periodical update.
