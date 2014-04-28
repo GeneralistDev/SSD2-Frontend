@@ -3,13 +3,13 @@
 angular.module('frontendApp')
   .controller('MainCtrl', function ($window, $scope, $compile, $timeout, $document, raptideAPIHTTP ) {
 
-    $scope.submit = function() {
-        $window.alert("submitted!");
-        raptideAPIHTTP.getAPK( function(data) { // On Success
-        //TODO: handle success callback.
-        }, 
-        function(data, status) { // On Error
-        });
-    }
+
+  	// Sets the download APK link
+	$scope.$on(raptideAPIHTTP.postVisualModelOKEvent(), function(event) {
+
+		//TODO: set download link to grey by default
+		//TODO: set download link to available after the first successful post request (or after SNMP trap)
+		$scope.url = raptideAPIHTTP.getAPKURL();
+	});
 });
 

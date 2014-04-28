@@ -1,17 +1,20 @@
 'use strict';
  
+ // The DSL-Panel Directive handles the presentation of the DSL data retrieved from the RAPTIDE API.
 var app = angular.module('frontendApp.directives.dslPanel', [])
   .directive('dslPanel', function($compile, raptideAPIHTTP) {
 	return {
 		restrict : 'A',
 		replace: true,
 		scope : {},
-		template : '<h3>{{data}}</h3>',
-		compile : compile,
+		template : '<h3>{{data}}</h3>', //TODO: use an external html file template
 		controller : controller,
-		link : link, 
 	}
 
+	// Manages the interactions between the raptideAPIHTTP service.
+	// This essentially requests the DSL from the service and formats it in a presentable way.
+	//
+	// TODO: Syntax highlighting and proper code formatting. 
 	function controller($scope, $element, $timeout) {
 		$scope.data = "this is the dsl panel";
 
@@ -39,14 +42,8 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 			        console.log("Unknown exception was handled");
 			    }
 			    // console.log("Got here");
-			    //TODO: handle exception here
+			    // TODO: handle exception here
     		}
     	});
-	}
-
-	function link(scope, element, attrs) {
-	}
-
-	function compile(tElement, tAttrs, transclude) {
 	}
   });

@@ -1,6 +1,13 @@
 'use strict';
 
-//Singleton
+// Singleton
+// Acts as the interface to the raptide API web server. When a successful respones is recieved 
+// a global event is fired pertaining to the response type, informing the controllers and allowing
+// them to respond appropriately. 
+// 
+// Refer to the API docs for more information on response codes and valid request.
+// See Link:
+// https://docs.google.com/document/d/1ymm5JxymRaUHveXnVgvbNbWf8D08Hx2GNmioxPNem50/edit
 var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
   .service('raptideAPIHTTP', function($http, $rootScope) {
   	
@@ -22,22 +29,27 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
       return "attributesContext.putVisualModelOKEvent";
     }
 
-    // Returns the unique event identifier of the getAPKOKEvent. 
-    // This event type is issued after an ok response is recieved after a getAPK request.
-    this.getAPKOKEvent = function() {
-      return "attributesContext.getAPKOKEvent";
-    }
-
     // Returns the unique event identifier of the postVisualModelOKEvent. 
     // This event type is issued after an ok response is recieved after a postVisualModel request.
     this.postVisualModelOKEvent = function() {
       return "attributesContext.postVisualModelOKEvent";
     }
 
+    // Returns the link to directly download the APK file from the server.
+    this.getAPKURL = function()
+    {
+        if(this.vismodelid === "") {
+	        console.log("APK download link could not be created. visual model id has been provided");
+	        throw new VisualModelIDException("No visual model id has been set"); 
+      	}
+
+    	return url + "jar/" + this.vismodelid;
+    }
+
     // DSL directive calls this on PutModelOk event.
     // Retrieves the DSL for the given vismodelid from the raptide- API.  
     // This should be called after a successful postVisualModel call. 
-    this.getDSL = function(callback) {
+    this.getDSL = function(successCallback, errorCallBack) {
 
       if(this.vismodelid === "") {
         console.log("GET DSL request could not be sent: visual model id has been provided");
@@ -56,18 +68,14 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
       }).success(function(data, status, headers, config){
               
               console.log("GET DSL request was successful");
-              callback(data);
+              successCallback(data);
               $rootScope.$broadcast(_self.getDSLOKEvent()); 
               //Fire getDSL ok event
       }). error(function(data, status, headers, config) {
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
 
-              //TODO: case the status and provide a suitable error message based on the response code
+              // TODO: case the status and provide a suitable error message based on the response code
               console.log("GET DSL request was unsuccessful. Error code: " + parseInt(status));
-              //Fire getDSL fail event
 
-              // throw "exception";
               errorCallBack(data, status);
       });
     }
@@ -100,47 +108,10 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
               $rootScope.$broadcast(_self.putVisualModelOKEvent()); 
          
       }). error(function(data, status, headers, config) {
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
+
               console.log("PUT vismodel request was unsuccessful. Error code: " + parseInt(status));
-              // callback(data);
-              //Inform the presentation that an error indication should be displayed.
-              // throw "exception";
+              // Inform the presentation that an error indication should be displayed.
               errorCallBack(data, status);
-      });
-    }
-
-    // Retrieves the generated APK file based on the latest vismodel submission.  
-    // This should be called after a successful postVisualModel call. 
-    this.getAPK = function(successCallback, errorCallBack) {
-      //TODO: handle invalid vismodel state.
-      if(this.vismodelid === "") {
-        console.log("GET APK request could not be sent: No visual model id has been provided");
-        throw new VisualModelIDException("No visual model id has been set"); 
-      }
-
-      console.log("Making GET APK request");
-
-      $http({ method: "GET",
-              url: (this.url + "/apk/" + this.vismodelid),
-              // withCredentials: true,
-              headers: {
-                'Content-Type': 'application/json; charset=utf-8'
-              }
-      }).success(function(data, status, headers, config){
-
-              console.log("GET APK request was successful");
-              successCallback(data);
-              $rootScope.$broadcast(_self.getAPKOKEvent()); 
-
-      }). error(function(data, status, headers, config) {
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
-              console.log("GET APK request was unsuccessful. Error code: " + parseInt(status));
-              //Fire getDSL fail event
-
-              errorCallBack(data, status);
-              // throw "exception";
       });
     }
 
@@ -149,8 +120,8 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
     this.postVisualModel = function(visModel, successCallback, errorCallBack) {
       console.log("Making POST vismodel request");
       // this.putVisualModel(visModel, successCallback, errorCallBack);
-      var putdata = "{}"; //TODO: use visModel param
-      // var putdata = visModel;
+      // var putdata = "{}"; //TODO: use visModel param
+      var putdata = visModel;
 
       $http({ method: "POST",
               url: (this.url + "/vismodel"),
