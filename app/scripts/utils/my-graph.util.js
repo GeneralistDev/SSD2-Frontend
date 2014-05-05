@@ -75,6 +75,7 @@ function myGraph(rootElement, width, height) {
     return node;
   }
 
+  // Removes the node which corresponds to the given ID from the graph
   this.removeNode = function (id) {
     var i = 0;
     var nodeToRemove = findNode(id);
@@ -94,6 +95,7 @@ function myGraph(rootElement, width, height) {
     update();
   }
 
+  // Removes a link which coresponds to the given ID from the graph
   this.removeLink = function (id) {
 
     linkCount--;
@@ -103,6 +105,7 @@ function myGraph(rootElement, width, height) {
     update();
   }
 
+  // Adds a new link to the graph 
   this.addLink = function (source, target, attributes, linkType, linkID) {
       linkType = linkType || "default";
 
@@ -235,37 +238,43 @@ function myGraph(rootElement, width, height) {
     return plinks;
   }
 
+  // Searches through d3.force.nodes for a node with the coresponding id.
   var findNodeIndex = function(id) {
       for (var i in nodes) {if (nodes[i]["id"] === id) return i};
   }
-
+  
+  // Searches through d3.force.links for a link with the coresponding id.
   var findLinkIndex = function(id) {
       for (var i in links) {if (links[i]["id"] === id) return i};
   }
-
+  
+  // Extracts the width of the root element.
   this.getWidth = function(){
-    return $(rootElement).width();
+    return $(rootElement).width(); //TODO: refactor
   }
 
+  // Extracts the height of the root element.
   this.getHeight = function(){
-    return $(rootElement).height();
+    return $(rootElement).height(); //TODO: refactor
   }
 
+  // Analyses the node's attributes and returns a list of visual properties that can be bound
+  // to the node DOM element.
   var getNodeVisualProperties = function(nodeType, attributes) {
     var textProperties = {};
     textProperties.textValue = attributes.name; //TODO: infer from node type
 
     var imageProperties = { };
 
-
+    // Assigning the image visual properties
     switch (nodeType) {
       case "person" : 
         imageProperties.imagePath = "images/stick_figure.svg";
 
-        imageProperties.width = "70";
+        imageProperties.width = "70"; //TODO: fix so it is not hard coded
         imageProperties.height = "70";
         break;
-      case "disconnected-link-node" :
+      case "disconnected-link-node" : //TODO: remove
         imageProperties.imagePath = "images/disconnected_link_node.svg";
 
         imageProperties.width = "20";
@@ -333,9 +342,13 @@ function myGraph(rootElement, width, height) {
 
   var drag = force.drag();
 
+  // Creates representations for any new nodes or links that have been added to d3.force 
+  // and binds their appropriate visual properties to them. 
   var update = function () {
     var linkSelectBox = vis.selectAll("path.link-selectbox").data(links);
     
+    // This is a selectable invisible box that is larger than the actual drawing of the link path
+    // This is done to make it easier to select links.
     linkSelectBox.enter().insert("path")
         .attr("class", "link-selectbox")
         .attr("link-type",  function(d) {
@@ -344,8 +357,8 @@ function myGraph(rootElement, width, height) {
         .attr("id", function(d) {
           return "link_selectbox "+d.id;
         })
-        .on('mousedown', function(d){
-          d3.event.stopPropagation();  //TODO: fix precision problem
+        .on('mousedown', function(d){ // Binding the select event to the select box
+          d3.event.stopPropagation();  // TODO: fix precision problem
           _self.dispatch.linkMouseDown(d);
         });
 
@@ -354,7 +367,9 @@ function myGraph(rootElement, width, height) {
           return d.source.id + "-" + d.target.id; 
         });
 
-    var linkEnter = link.enter().insert("path")
+    // Selects any new linkd data that does not already have a dom element
+    // and creates link elements for them.
+    var linkEnter = link.enter().insert("path") 
         .attr("class", "link")
         .attr("link-type",  function(d) {
           return d.linkType;
@@ -362,13 +377,16 @@ function myGraph(rootElement, width, height) {
         .attr("id", function(d) {
           return "link_ "+d.id;
         })
-        .on('mousedown', function(d){
+        .on('mousedown', function(d){ // Binding the select event to the actual link path
           d3.event.stopPropagation();  //TODO: fix precision problem
           _self.dispatch.linkMouseDown(d);
         });
 
-    var linktext = vis.selectAll("g.linklabelholder").data(links);
+    // A element container that is relative to the link path
+    // This contains the text lable.
+    var linktext = vis.selectAll("g.linklabelholder").data(links); 
     
+    // Creates the link label element
     linktext.enter().append("g").attr("class", "linklabelholder")
         .attr("link-type",  function(d) {
           return d.linkType;
@@ -385,7 +403,7 @@ function myGraph(rootElement, width, height) {
         .attr("dy", "1em")
         .attr("text-anchor", "middle")
         .text(function(d) { 
-          if(d.attributes.name !==  null)
+          if(d.attributes.name !==  null) // Bind the text of the label to the element
             return d.attributes.name; //TODO: show the primary relationship based on relationship type
           return "default " + d.id;
         })
@@ -394,20 +412,23 @@ function myGraph(rootElement, width, height) {
           _self.dispatch.linkMouseDown(d);
         });
 
-    link.exit().remove();
+    //Removes any links and/or link texts that have strayed to far from the canvas borders
+    link.exit().remove(); 
     linktext.exit().remove();
 
+    // Selects all existing link node DOM elements
     var node = vis.selectAll("g.node")
         .data(nodes, function(d) { 
           return d.id;
         });
 
+    // Creates new node DOM elements for any new node data.
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
         .attr("id", function(d) {
           return "node_ "+d.id;
         })
-        .on('mousedown', function(d){
+        .on('mousedown', function(d){ //Binds the select event to the node
           d3.event.stopPropagation();  
         
           d3.event.preventDefault();
@@ -417,13 +438,14 @@ function myGraph(rootElement, width, height) {
           else if(d3.event.which == 3)  //right mouse button id
             _self.dispatch.nodeRightClick(d);
           })
-        .on('mouseup', function(d){
+        .on('mouseup', function(d){ //Binds the mouse up event to the node
           // d3.event.stopPropagation();  
           _self.dispatch.nodeMouseUp(d);
         })
-        .call(drag);
+        .call(drag); //Makes the node draggable
 
-    nodeEnter.append("image")
+    // Creates an image element which represents the node
+    nodeEnter.append("image") 
         .attr("class", "node-image") 
         .attr("node-type", function(d) {
 
@@ -445,6 +467,7 @@ function myGraph(rootElement, width, height) {
           return d.imageHeight;
         });
 
+    // Creates a label for the node
     nodeEnter.append("text")
         .attr("class", "node-text")
         .attr("dx", ".35em") 
@@ -456,11 +479,17 @@ function myGraph(rootElement, width, height) {
           return d.textValue;
         });
 
-    //removes any nodes that have     
+    // Removes any nodes that have strayed too far from the bounderies of the canvas    
     node.exit().remove();
 
+    // When the force layout is ticked it makes positional changes to each of the link and node elements
+    // in most cases this will simply result in the positions being updated on the screen.
     force.on("tick", function() {
+      // link, linkSelectBox, linktext and node are arrays containing all of their elements.
+      // Updates that are assigned to any of these structures propagate to all of their associated
+      // elements
 
+      // Updates the position of each of the links
       link.attr("d", function(d) {
             return "M" + 
               d.source.x + "," + 
@@ -471,28 +500,26 @@ function myGraph(rootElement, width, height) {
 
       //select box has same path as link (though has a much larger stroke width)
       linkSelectBox.attr("d", function(d) {
-            return "M" + 
-              d.source.x + "," + 
-              d.source.y + "L" + 
-              d.target.x + "," + 
-              d.target.y;
+        return "M" + 
+          d.source.x + "," + 
+          d.source.y + "L" + 
+          d.target.x + "," + 
+          d.target.y;
       });
 
+      // Updates the position of the link text label
       linktext.attr("transform", function(d) {
-      return "translate(" + (d.source.x + d.target.x) / 2 + "," 
-      + (d.source.y + d.target.y) / 2 + ")"; });
+        return "translate(" + (d.source.x + d.target.x) / 2 + "," 
+                    + (d.source.y + d.target.y) / 2 + ")"; 
+      });
 
-      /*node.attr("cx", function(d) {return d.x; })
-          .attr("cy", function(d) {return d.y; });*/
-
+      // Updates the position of the node
       node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
     });
 
     // Restart the force layout.
     force.start();
   }
-
-
 
   // Make it all go
   update();
