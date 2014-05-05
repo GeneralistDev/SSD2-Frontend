@@ -18,7 +18,6 @@ var app = angular.module('frontendApp.services.modelUpdater', [])
 
 		    	if(delayRequired === true) {
 		    		delayRequired = false;
-		    		// console.log("Update delayed for " + delay + " ms");
 		    		_self.periodicalUpdate(delay);
 		    	} else {
 

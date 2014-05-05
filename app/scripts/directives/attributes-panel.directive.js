@@ -1,5 +1,11 @@
 'use strict';
  
+ // The attributes panel directive allows the user to modify and and attributes to the current
+ // graph selection (selected entity). It's first responsibility is to change the 
+ // the current form context (defines which entities attributes will be displayed) when
+ // the user selects a new entity on the graph.
+ // It's second responsability is to update the visual model and notify the editor graph 
+ // directive when the user makes any changed to the attributes. 
 var app = angular.module('frontendApp.directives.attributesPanel', [])
   .directive('attributesPanel', function($compile, $rootScope, attributesContext) {
 	return {
@@ -7,11 +13,10 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
 	     // replace: true,
 		scope : {},
 		templateUrl : 'views/attributes-panel.html',
-		compile : compile,
 		controller : controller,
-		link : link, 
 	}
 
+	// Handles the main business logic for the attributes panel directive
 	function controller($scope, $element, $timeout) {
 	    
 	    // Attribute values that are bound to the attributes form
@@ -64,11 +69,5 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
 
       		$scope.context = attributesContext.context; 
 	    };
-	}
-
-	function link(scope, element, attrs) {
-	}
-
-	function compile(tElement, tAttrs, transclude) {
 	}
   });

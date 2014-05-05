@@ -1,17 +1,17 @@
 'use strict';
 
-
+// The Editor graph panel directive is mainly responsible for the presentation and updating of the visual
+// model. 
 var app = angular.module('frontendApp.directives.editorGraphPanel', [])
   .directive('editorGraphPanel', function($compile, attributesContext, raptideAPIHTTP, modelUpdater) {
   	var elem;
 	return {
 		restrict : 'A',
 		scope : {},
-		compile : compile,
-		controller : controller,
-		link : link, 
+		controller : controller
 	}
 
+  // Handles and delegates the main business logic of the Editor Graph panel
 	function controller($scope, $element, $timeout) {
   	console.log("hello editor controller");
 
@@ -46,17 +46,24 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
 
 
 	}
-
-	function link(scope, element, attrs) {
-	}
-
-	function compile(tElement, tAttrs, transclude) {
-	}
-  });
+});
 
 
+// The editor is responsible for handling the variouse user interaction events dispatched
+// by the graph and mapping them to the core business logic. In addition this is also responsible
+// for refreshing the visuals of entities when the visualmodel is updated by another module (e.g.,
+// the attributes panel).  This is also responsible for managing the visual model and sending 
+// model updates to the model updater service.
+// 
+// Key Interaction Related Responsabilities:
+//    -Maping the left click on canvas to: adding nodes
+//    -Maping the let click on a node or link to: Selecting a graph entity (notifies the attributes panel
+//    to update it's context)
+//    -Mapping the right click on one node and the left click on another node to: Adding links between two
+//    nodes.
 function editor(graph, attributesContext, modelUpdater) {  
 
+  // Defines the events that can be dispatched by the graph
   graph.dispatch = d3.dispatch("canvasMouseDown", "canvasRightClick", 
                     "nodeMouseDown", "nodeMouseUp", "nodeRightClick", "linkMouseDown",
                     "canvasDeleteKeyDown");
@@ -66,6 +73,7 @@ function editor(graph, attributesContext, modelUpdater) {
   var nodeIsSelected = false; // false: linkIsSelected, true: node is selected
   var nodeIsBeingDragged = false;
 
+  // Binds the events to internal event handler methods 
   graph.dispatch
   .on("canvasMouseDown", function(point) {
     canvasMouseDown(point);

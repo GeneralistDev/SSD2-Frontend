@@ -148,6 +148,7 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
     }
 });
 
+
 function VisualModelIDException(message) {
   this.message = message;
   this.name = "NoVisualModelIDException";

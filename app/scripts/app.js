@@ -5,14 +5,15 @@ angular.module('frontendApp', [
   'ngResource',
   'ngSanitize',
   'ngRoute',
-  'frontendApp.services.dummy',
-  'frontendApp.services.attributesContext',
+
+  'frontendApp.services.attributesContext', // Services
   'frontendApp.services.modelUpdater',
   'frontendApp.services.raptideAPIHTTP',
-  'frontendApp.directives.attributesPanel',
+
+  'frontendApp.directives.attributesPanel', // Directives
   'frontendApp.directives.w2uiLayout',
   'frontendApp.directives.editorGraphPanel',
-  'frontendApp.directives.paletPanel',
+  'frontendApp.directives.palletPanel',
   'frontendApp.directives.dslPanel'
 ])
   .config(function ($routeProvider, $httpProvider) {
@@ -23,10 +24,6 @@ angular.module('frontendApp', [
       .when('/', {
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
-      })
-      .when('/ui', {
-        templateUrl: 'views/ui.html',
-        controller: 'UiCtrl'
       })
       .otherwise({
         redirectTo: '/'

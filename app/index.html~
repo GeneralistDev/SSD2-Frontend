@@ -67,23 +67,23 @@
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
 
-        <!-- Angular Controllers -->
-        <script src="scripts/controllers/main.controller.js"></script>
-
-        <!-- Angular Services -->
         <script src="scripts/services/model-updater.service.js"></script>
+        <script src="scripts/services/dummy.service.js"></script>
         <script src="scripts/services/attributes-context.service.js"></script>
         <script src="scripts/services/raptide-api-http.service.js"></script>
 
-        <!-- Angular Directives -->
+        <script src="scripts/controllers/main.js"></script>
+
         <script src="scripts/directives/attributes-panel.directive.js"></script>
         <script src="scripts/directives/editor-graph-panel.directive.js"></script>
-        <script src="scripts/directives/pallet-panel.directive.js"></script>
+        <script src="scripts/directives/palet-panel.directive.js"></script>
         <script src="scripts/directives/dsl-panel.directive.js"></script>
+
+        <script src="scripts/utils/my-graph.util.js"></script>
+
         <script src="scripts/directives/w2ui-layout.directive.js"></script>
 
-        <!-- Utils -->
-        <script src="scripts/utils/my-graph.util.js"></script>
+        
 
         <!-- endbuild -->
 </body>
