@@ -172,6 +172,12 @@ module.exports = function (grunt) {
           generatedImagesDir: '<%= yeoman.dist %>/images/generated'
         }
       },
+      devDist: {
+        options: {
+          cssDir: '<%= yeoman.dist %>/styles',
+          generatedImagesDir: '<%= yeoman.dist %>/images/generated'  
+        }
+      },
       server: {
         options: {
           debugInfo: true
@@ -271,6 +277,17 @@ module.exports = function (grunt) {
 
     // Copies remaining files to places other tasks can use
     copy: {
+      devDist: {         
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= yeoman.app %>',
+          dest: '<%= yeoman.dist %>',
+          src: [
+            '**','!styles/**'   // everything but styles/
+          ]
+        }]
+      },
       dist: {
         files: [{
           expand: true,
@@ -350,8 +367,17 @@ module.exports = function (grunt) {
       }
     }
   });
-
-
+  
+  //
+  // register a 'devDist' task that calls the two tasks above
+  //
+  grunt.registerTask('devDist', [
+    'clean:dist',
+    'copy:devDist',
+    // 'concat',
+    'compass:devDist'
+  ]);
+  
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
       return grunt.task.run(['build', 'connect:dist:keepalive']);

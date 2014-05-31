@@ -1,0 +1,26 @@
+{
+	dataset : {
+		nodes : [{
+		index : <standard index number that d3 uses>,
+		id: <key identifier for the model>,
+		nodeType : <enum field>,
+		attributes : {<contents may vary depending on node type>}
+		x : <The x-coordinate of the current node position>,
+		y : <The y-coordinate of the current node position>,
+		px: <The x-coordinate of the previous node position>,
+		py: <The y-coordinate of the previous node position>,
+		fixed: <a boolean indicating whether node position is locked>,
+		weight: <>
+		}],
+		
+		links : [{
+		id: <key identifier for the model>,
+		source:  < reference to the source node that the link is joined to>,
+		target: <reference to the the target node that the link is joined to>,
+		sourceID: <reference to the source node for the model interpretation>,
+		targetID: <reference to the target node for the model interpretation>,
+		linkType : <enum field>,
+		attributes : {<contents may vary depending on link type>}
+		}]
+	}
+}

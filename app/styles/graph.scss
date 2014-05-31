@@ -1,0 +1,30 @@
+.link {
+    stroke: #000;
+    stroke-width : 3px;
+}
+
+.link[link-type="fred"] {
+	stroke : #C00;
+} 
+
+.link-selectbox {
+	stroke-width : 20px;
+	stroke: #000;
+	stroke-opacity : 0.0;
+}
+
+.node {
+	.node-text {
+
+	}
+
+	.node-image[node-type="default"] {
+
+	}
+
+	.node-image[node-type="disconnected-link-node"] {
+
+	}
+}
+
+

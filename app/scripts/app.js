@@ -4,9 +4,22 @@ angular.module('frontendApp', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
-  'ngRoute'
+  'ngRoute',
+
+  'frontendApp.services.attributesContext', // Services
+  'frontendApp.services.modelUpdater',
+  'frontendApp.services.raptideAPIHTTP',
+
+  'frontendApp.directives.attributesPanel', // Directives
+  'frontendApp.directives.w2uiLayout',
+  'frontendApp.directives.editorGraphPanel',
+  'frontendApp.directives.palletPanel',
+  'frontendApp.directives.dslPanel'
 ])
-  .config(function ($routeProvider) {
+  .config(function ($routeProvider, $httpProvider) {
+    //Enable cross domain calls
+    $httpProvider.defaults.useXDomain = true;
+
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
