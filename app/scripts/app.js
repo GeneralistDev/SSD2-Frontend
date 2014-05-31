@@ -13,7 +13,7 @@ angular.module('frontendApp', [
   'frontendApp.directives.attributesPanel', // Directives
   'frontendApp.directives.w2uiLayout',
   'frontendApp.directives.editorGraphPanel',
-  'frontendApp.directives.palletPanel',
+  'frontendApp.directives.palettePanel',
   'frontendApp.directives.dslPanel'
 ])
   .config(function ($routeProvider, $httpProvider) {
