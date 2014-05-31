@@ -11,19 +11,62 @@
  // The main responsabilities include the presentation of the available entities that can be added
  // to the graph and notifying the editor graph of the entity adding mode that has been selected.
 var app = angular.module('frontendApp.directives.palettePanel', [])
-  .directive('palettePanel', function($compile) {
+  .directive('palettePanel', function($compile, $window) {
 	return {
 		restrict : 'A',
 		replace: true,
 		scope : {},
-		template : '<h3>this is the palette panel</h3>',
+		templateUrl : 'views/palette-panel.html',
 		controller : controller
 	}
 
 	// Handles the business logic of the palette panel directive.
 	function controller($scope, $element, $timeout) {
-		// TODO: Load the available entities from a config
+		
+		$scope.selectPaletteOption = function(value) {
+			// $window.alert(value.label);
+			$scope.currentSelection = value;
+		}
+
 		// TODO: Show the available entities in a selecter
 		// TOOD: Notify the editor graph when a palette selection occurs.
+		$scope.linkOptions = loadLinkOptions();
+		$scope.nodeOptions = loadNodeOptions();
+
+		$scope.currentSelection = $scope.linkOptions[0];
+	}
+
+	// Loads the list of available link options
+	function loadLinkOptions() {
+
+		// TODO: Load the available link options from a config
+		var linkOptions = [{
+								linkIndex : 0,
+								linkType : "screenTransitionLink",
+								label : "Screen Transition Link",
+								icon : "images/ScreenTransitionLinkIcon.svg",
+							}];
+
+		return linkOptions;
+	}
+
+	// Loads the list of available node options
+	function loadNodeOptions() {
+
+		// TODO: Load the available link options from a config
+		var nodeOptions = [{
+							listIndex : 0,
+							nodeType : "appProperties",
+							label : "App Properties",
+							icon : "images/AppPropertiesIcon.svg",
+						},
+						{
+							listIndex : 1,
+							nodeType : "screenNode",
+							label : "Screen Node",
+							icon : "images/DefaultScreenIcon.svg",
+						}];
+
+		return nodeOptions;
 	}
   });
