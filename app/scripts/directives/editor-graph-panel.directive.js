@@ -106,7 +106,39 @@ function editor(graph, attributesContext, modelUpdater, paletteSelection) {
       // previouselySelectedEntity = null; 
 
       nodeIsSelected = true; 
-      selectedEntity = graph.addNode(point[0], point[1], paletteSelection.selectedOption.optionType );
+      var attributes; 
+
+      switch(paletteSelection.selectedOption.optionType) {
+        case "screenNode":
+          attributes = {
+                      "isTab": false,
+                      "tabLabel": "",
+                      "screenLabel": "",
+                      "name": "Screen Name",
+                      "apiDomain": "",
+                      "layoutItems": [{
+                              "viewType": "",
+                              "value": ""
+                            }]
+                    }
+          break;
+
+        case "appPropertiesNode":
+          attributes = {
+                      "navigationType": "None",
+                      "appName": "App Name",
+                      "icon": ""
+                    };
+          break;
+
+        default:
+          //Assert 
+          attributes = {};
+          break;
+      }
+
+
+      selectedEntity = graph.addNode(point[0], point[1], attributes, paletteSelection.selectedOption.optionType );
       
       modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
       attributesContext.changeContext(selectedEntity, nodeIsSelected );
@@ -143,9 +175,22 @@ function editor(graph, attributesContext, modelUpdater, paletteSelection) {
       if(paletteSelection.selectedOption.optionIsNode === false) {
 
         if(previouselySelectedEntity !== null ) {
-            graph.addLink(previouselySelectedEntity, node, paletteSelection.selectedOption.optionType );
-            modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
-            previouselySelectedEntity = null;
+          var attributes; 
+
+          switch(paletteSelection.selectedOption.optionType) {
+            case "screenTransitionLink":
+              attributes = { condition: "none"}
+              break;
+            default:
+              //Assert 
+              attributes = {};
+              break;
+          }
+
+          graph.addLink(previouselySelectedEntity, node, attributes, paletteSelection.selectedOption.optionType );
+          modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
+          previouselySelectedEntity = null;
+
         } else {
           previouselySelectedEntity = node;
         }
@@ -200,49 +245,4 @@ function editor(graph, attributesContext, modelUpdater, paletteSelection) {
       modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
     }
   }
-
-  var demo1 = function() {
-    var fredNode = graph.addNode( 50, 40, {name : "Fred"}, "person");
-    var barneyNode = graph.addNode(100, 40, {name : "Barney"}, "person");
-
-    var margeNode = graph.addNode( 50, 100, {name : "Marge"}, "person");
-    var richardNode = graph.addNode(100, 100, {name : "Richard"}, "person");
-
-    graph.addLink(fredNode, barneyNode, { name: "mates"});
-    graph.addLink(margeNode, richardNode, {name: "married"});
-  }
-
-  var demo2 = function() {
-    var fredNode = graph.addNode( 50, 40, {name : "Fred"}, "person");
-    var barneyNode = graph.addNode(100, 40, {name : "Barney"}, "person");
-
-    graph.addLink(fredNode, barneyNode, { name: "mates"});
-    // graph.addDisconnectedLink(200, 300, {name : "associates"});
-
-
-    // var link = graph.addDisconnectedLink(400, 300, {name : "cohorts"});
-    // graph.joinLinkToNode(link, barneyNode, false);
-  }
-
-  var demo3 = function() {
-    var markusNode = graph.addNode( 50, 40, {name : "Markus Lumpe"}, "person");
-    var cPlusPLusNode = graph.addNode(100, 40, {name : "C++"}, "person");
-    var cSharpDevTeam = graph.addNode(100, 40, {name : "C# dev team"}, "person");
-
-    var danielParkerNode = graph.addNode(100, 40, {name : "Daniel Parker"}, "person");
-    var coffeeNode = graph.addNode(100, 40, {name : "Coffee"}, "person");
-
-    graph.addLink(markusNode, cPlusPLusNode, { name: "Best of Friends"});
-
-    graph.addLink(danielParkerNode, coffeeNode, { name: "Loves"});
-    graph.addLink(markusNode, cSharpDevTeam, { name: "Enemies"});
-    graph.removeNode(danielParkerNode.id);
-    // var link = graph.addDisconnectedLink(400, 300, {name : "cohorts"});
-    // graph.joinLinkToNode(link, markusNode, false);
-  }
-
-  // demo1();
-  // demo2();
- 
-  demo3();
 }

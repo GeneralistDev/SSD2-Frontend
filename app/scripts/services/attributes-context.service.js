@@ -29,7 +29,7 @@ var app = angular.module('frontendApp.services.attributesContext', [])
 
   	// Changes the attributes context. 
   	this.changeContext = function(selectedEntity, isNode) {
-      console.log("CHanged context:");
+      console.log("Changed context:");
       console.log(JSON.stringify(selectedEntity.attributes));
   		this.context.entity = selectedEntity;
   		this.context.entityIsNode = isNode;
@@ -50,6 +50,8 @@ var app = angular.module('frontendApp.services.attributesContext', [])
     this.updateAttributes = function( updatedEntity, isNode) {
       if((isNode === this.context.entityIsNode ) && (updatedEntity.id === this.context.entity.id) ) {
         this.context.entity = updatedEntity;
+        console.log("Attributes Updated:");
+        console.log(JSON.stringify(updatedEntity.attributes));
         $rootScope.$broadcast(this.updateAttributesEvent());
       } else {
         //Throw desynchronisation error!

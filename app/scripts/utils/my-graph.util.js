@@ -46,6 +46,7 @@ function myGraph(rootElement, width, height) {
     y = y;
     id = id || ("" + (++nodeCount));
     nodeType = nodeType || "default";
+
     attributes = attributes || {name : " "};
 
     //view or presenter code
@@ -184,7 +185,7 @@ function myGraph(rootElement, width, height) {
   this.refreshNode = function(node) {
 
     d3.select("[id='node_text_ " + node.id + "']").text(function() {
-        return node.attributes.name;
+        return node.attributes.name; //TODO: modify text based on node type
       });
 
     // Find the visuals
@@ -201,7 +202,7 @@ function myGraph(rootElement, width, height) {
   this.refreshLink = function(link) {
     d3.select("[id='link_label_"+ link.id + "']").text(function() {
         console.log("refreshLink got here!");
-        return link.attributes.name;
+        return link.attributes.condition; //TODO: modify text based on link type
       });
   }
 
@@ -262,29 +263,31 @@ function myGraph(rootElement, width, height) {
   // to the node DOM element.
   var getNodeVisualProperties = function(nodeType, attributes) {
     var textProperties = {};
-    textProperties.textValue = attributes.name; //TODO: infer from node type
+    
 
     var imageProperties = { };
 
     // Assigning the image visual properties
     switch (nodeType) {
-      case "person" : 
-        imageProperties.imagePath = "images/stick_figure.svg";
-
-        imageProperties.width = "70"; //TODO: fix so it is not hard coded
-        imageProperties.height = "70";
+      case "appPropertiesNode" : 
+        imageProperties.imagePath = "images/AppPropertiesIcon.svg";
+        textProperties.textValue = "App Properties"; //TODO: infer from node type
+        imageProperties.width = "120"; //TODO: fix so it is not hard coded
+        imageProperties.height = "120";
         break;
-      case "disconnected-link-node" : //TODO: remove
-        imageProperties.imagePath = "images/disconnected_link_node.svg";
 
-        imageProperties.width = "20";
-        imageProperties.height = "20";
+      case "screenNode" : 
+        imageProperties.imagePath = "images/DefaultScreenIcon.svg";
+        textProperties.textValue = attributes.name; //TODO: infer from node type
+        imageProperties.width = "120"; //TODO: fix so it is not hard coded
+        imageProperties.height = "120";
         break;
+
       case "default" : 
         imageProperties.imagePath = "images/stick_figure.svg";
 
-        imageProperties.width = "70";
-        imageProperties.height = "70";
+        imageProperties.width = "120";
+        imageProperties.height = "120";
         break;
       default : //usually for disconnected link end points
         imageProperties.imagePath = "images/empty.svg";//blank svg image 
@@ -403,8 +406,8 @@ function myGraph(rootElement, width, height) {
         .attr("dy", "1em")
         .attr("text-anchor", "middle")
         .text(function(d) { 
-          if(d.attributes.name !==  null) // Bind the text of the label to the element
-            return d.attributes.name; //TODO: show the primary relationship based on relationship type
+          if(d.attributes.condition !==  null) // Bind the text of the label to the element
+            return d.attributes.condition; //TODO: show the primary relationship based on relationship type
           return "default " + d.id;
         })
         .on('mousedown', function(d){
@@ -470,8 +473,12 @@ function myGraph(rootElement, width, height) {
     // Creates a label for the node
     nodeEnter.append("text")
         .attr("class", "node-text")
-        .attr("dx", ".35em") 
-        .attr("dy", 80)
+        .attr("dx", function(d){
+          return "-40"; 
+        }) 
+        .attr("dy", function(d){
+          return (d.imageY + (120) + 20); //TODO: fix so this isn't hard coded 
+        }) 
         .attr("id", function(d) {
           return "node_text_ "+d.id;
         })

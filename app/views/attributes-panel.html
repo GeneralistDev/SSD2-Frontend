@@ -4,10 +4,11 @@
 	<div ng-show="context.entity.linkType==='screenTransitionLink'">
 		<form>
 			<p>Transition Condition: <br>
-			<select ng-model='layoutItem.viewType'
+			<select ng-model='context.entity.attributes.condition'
 					ng-change='attributesChangeHandler()'>
+				<option value="None">None</option>
 				<option value="ButtonClick">Button Click</option>
-				<option value="Label">List Item Click</option>
+				<option value="ListItemClick">List Item Click</option>
 			</select>
 		</form>
 	</div>
