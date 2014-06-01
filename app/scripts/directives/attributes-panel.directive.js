@@ -13,7 +13,7 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
 	     // replace: true,
 		scope : {},
 		templateUrl : 'views/attributes-panel.html',
-		controller : controller,
+		controller : controller
 	}
 
 	// Handles the main business logic for the attributes panel directive
@@ -25,8 +25,11 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
     	// Entity that is currently selected
     	$scope.context= {
 	  		entity : {
+	  			linkType : "screenTransitionLink",
 	  			attributes : {
-      				name: "..."
+      				name: "...",
+      				layoutItems : [{value: "hello",
+      								viewType: "Web"}]
     			}},
 	  		entityIsNode : true
   		};
@@ -47,7 +50,6 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
 
 			    if($scope.context.entityIsNode === true) {
 			    	$scope.enitityType = "Node";
-			    	console.log("Got here!");
 			    }
 			    else {
 			    	$scope.enitityType = "Link";
@@ -69,5 +71,21 @@ var app = angular.module('frontendApp.directives.attributesPanel', [])
 
       		$scope.context = attributesContext.context; 
 	    };
+
+	    // Used in the screen node context to add layout items
+	    $scope.addLayoutItem = function() {
+			$timeout(function() {
+				// $scope.context.entity.attributes.layoutItems.push({})
+				$scope.context.entity.attributes.layoutItems.push({viewType : "", value : ""});
+			});	
+		};
+
+		// Used in the screen node context to remove layout items
+		$scope.removeLayoutItem = function() {
+			$timeout(function() {
+				// $scope.context.entity.attributes.layoutItems.push({})
+				$scope.context.entity.attributes.layoutItems.splice(-1,1);
+			});	
+		}
 	}
   });

@@ -233,5 +233,5 @@ function editor(graph, attributesContext, modelUpdater) {
   // demo1();
   // demo2();
  
-  // demo3();
+  demo3();
 }

@@ -31,7 +31,8 @@ var app = angular.module('frontendApp.directives.palettePanel', [])
 		$scope.selectPaletteOption = function(selectedOption, isNode) {
 			//Notifies the editor graph that an option has been selected
 			paletteSelection.makeSelection(selectedOption.optionType, isNode)
-			$scope.currentSelection = paletteSelection.selectedOption.optionType;
+			// $scope.currentSelection = paletteSelection.selectedOption.optionType;
+			$scope.currentSelection = selectedOption.label;
 		}
 	}
 
@@ -55,7 +56,7 @@ var app = angular.module('frontendApp.directives.palettePanel', [])
 		// TODO: Load the available link options from a config
 		var nodeOptions = [{
 							listIndex : 0,
-							optionType : "appProperties",
+							optionType : "appPropertiesNode",
 							label : "App Properties",
 							icon : "images/AppPropertiesIcon.svg"
 						},
