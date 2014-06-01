@@ -24,7 +24,7 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
     		//TODO: fix so that this is not hard coded
     		//TODO: move the graph initialization to the link
     		editorGraph = new myGraph("#layout_layout_panel_main > div.w2ui-panel-content", 1500, 1500);
-			  editorOb = new editor(editorGraph, attributesContext, modelUpdater);
+			  editorOb = new editor(editorGraph, attributesContext, modelUpdater, paletteSelection);
 
         $timeout(function() {
           //TODO: Authenticate session
@@ -45,8 +45,6 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
 
         modelUpdater.updateVisualModel(editorGraph.getData()); //TODO: validate model
     });
-
-
 	}
 });
 
@@ -63,7 +61,7 @@ var app = angular.module('frontendApp.directives.editorGraphPanel', [])
 //    to update it's context)
 //    -Mapping the right click on one node and the left click on another node to: Adding links between two
 //    nodes.
-function editor(graph, attributesContext, modelUpdater) {  
+function editor(graph, attributesContext, modelUpdater, paletteSelection) {  
 
   // Defines the events that can be dispatched by the graph
   graph.dispatch = d3.dispatch("canvasMouseDown", "canvasRightClick", 
@@ -71,7 +69,7 @@ function editor(graph, attributesContext, modelUpdater) {
                     "canvasDeleteKeyDown");
 
   var _self = this;
-  var selectedEntity;
+  var selectedEntity, previouselySelectedEntity = null;
   var nodeIsSelected = false; // false: linkIsSelected, true: node is selected
   var nodeIsBeingDragged = false;
 
@@ -100,13 +98,19 @@ function editor(graph, attributesContext, modelUpdater) {
   });
 
   // Handles mouse down on canvas event.
-  // Create node on the svg canvas where the user clicked
+  // Create node on the svg canvas where the user clicked if a node palette option is 
+  // currently selected.
   var canvasMouseDown = function(point) {
-    selectedEntity = graph.addNode(point[0], point[1] );
-    nodeIsSelected = true;
 
-    attributesContext.changeContext(selectedEntity, nodeIsSelected );
-    modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
+    if(paletteSelection.selectedOption.optionIsNode === true) {
+      // previouselySelectedEntity = null; 
+
+      nodeIsSelected = true; 
+      selectedEntity = graph.addNode(point[0], point[1], paletteSelection.selectedOption.optionType );
+      
+      modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
+      attributesContext.changeContext(selectedEntity, nodeIsSelected );
+    }
   }
 
   // Handles right click on canvas event.
@@ -119,15 +123,33 @@ function editor(graph, attributesContext, modelUpdater) {
 
   // Handles mouse down on node event.
   // Selects node and binds the attributes panel scope to the attributes of 
-  // this node.
+  // the selected node.
+  // Also, if a link palette option is selected this performs the add link
+  // mechanism, by storing the previouse node that has been selected and 
+  // then adding a link after a different node is selected. 
   var nodeMouseDown = function(node) {    
+    
+    if(paletteSelection.selectedOption.optionIsNode === true) {
+      previouselySelectedEntity = null;
+    }
+
     if(node !== selectedEntity) {
       nodeIsSelected = true;
       nodeIsBeingDragged = true;
 
       selectedEntity = node;
-
       attributesContext.changeContext(selectedEntity, nodeIsSelected );
+
+      if(paletteSelection.selectedOption.optionIsNode === false) {
+
+        if(previouselySelectedEntity !== null ) {
+            graph.addLink(previouselySelectedEntity, node, paletteSelection.selectedOption.optionType );
+            modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
+            previouselySelectedEntity = null;
+        } else {
+          previouselySelectedEntity = node;
+        }
+      }
     }
   }
 
@@ -139,19 +161,8 @@ function editor(graph, attributesContext, modelUpdater) {
   }
 
   // Handles node Right Click event.
-  // Creates link between previouse node selection (made with left click) and current selection (made with right click)
   var nodeRightClick = function(node) {
-    if(nodeIsSelected === true) {
-      graph.addLink(selectedEntity, node);
-      modelUpdater.updateVisualModel(graph.getData()); //TODO: validate model
-    } 
 
-    if(node !== selectedEntity) {
-      nodeIsSelected = true;
-      selectedEntity = node;
-
-      attributesContext.changeContext(selectedEntity, nodeIsSelected );
-    }
   }
 
   // Handles mouse down on link event. 
