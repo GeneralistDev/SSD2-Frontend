@@ -1,12 +1,12 @@
 <div>
 	<div><p><b>Current Selection: <br></b>
-	{{currentSelection.label}}<br></p></div>
+	{{currentSelection}}<br></p></div>
 	
 	
 	<div>
 		<b> Node Options </b>
 
-	    <div ng-repeat="nodeOption in nodeOptions" ng:click="selectPaletteOption(nodeOption)">
+	    <div ng-repeat="nodeOption in nodeOptions" ng:click="selectPaletteOption(nodeOption, true)">
 	      <img src={{nodeOption.icon}} width="120" height="120">
 	      <p>{{nodeOption.label}} </p>
 	    </div>
@@ -15,7 +15,7 @@
 	<div>
 		<b> Link Options </b>
 
-	    <div ng-repeat="linkOption in linkOptions" ng:click="selectPaletteOption(linkOption)">
+	    <div ng-repeat="linkOption in linkOptions" ng:click="selectPaletteOption(linkOption, false)">
 	    	<img src={{linkOption.icon}} width="120" height="120">
 	      <p>{{linkOption.label}} </p>
 	    </div>

@@ -9,6 +9,7 @@ angular.module('frontendApp', [
   'frontendApp.services.attributesContext', // Services
   'frontendApp.services.modelUpdater',
   'frontendApp.services.raptideAPIHTTP',
+  'frontendApp.services.paletteSelection',
 
   'frontendApp.directives.attributesPanel', // Directives
   'frontendApp.directives.w2uiLayout',

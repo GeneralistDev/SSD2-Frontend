@@ -3,7 +3,9 @@
 // The Editor graph panel directive is mainly responsible for the presentation and updating of the visual
 // model. 
 var app = angular.module('frontendApp.directives.editorGraphPanel', [])
-  .directive('editorGraphPanel', function($compile, attributesContext, raptideAPIHTTP, modelUpdater) {
+  .directive('editorGraphPanel', function($compile, attributesContext, raptideAPIHTTP, modelUpdater,
+                                            paletteSelection) {
+
   	var elem;
 	return {
 		restrict : 'A',
@@ -231,5 +233,5 @@ function editor(graph, attributesContext, modelUpdater) {
   // demo1();
   // demo2();
  
-  demo3();
+  // demo3();
 }

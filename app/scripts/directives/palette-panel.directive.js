@@ -11,7 +11,7 @@
  // The main responsabilities include the presentation of the available entities that can be added
  // to the graph and notifying the editor graph of the entity adding mode that has been selected.
 var app = angular.module('frontendApp.directives.palettePanel', [])
-  .directive('palettePanel', function($compile, $window) {
+  .directive('palettePanel', function($compile, $window, paletteSelection) {
 	return {
 		restrict : 'A',
 		replace: true,
@@ -23,17 +23,16 @@ var app = angular.module('frontendApp.directives.palettePanel', [])
 	// Handles the business logic of the palette panel directive.
 	function controller($scope, $element, $timeout) {
 		
-		$scope.selectPaletteOption = function(value) {
-			// $window.alert(value.label);
-			$scope.currentSelection = value;
-		}
+		$scope.currentSelection = paletteSelection.selectedOption.optionType; // Load default selection
 
-		// TODO: Show the available entities in a selecter
-		// TOOD: Notify the editor graph when a palette selection occurs.
 		$scope.linkOptions = loadLinkOptions();
 		$scope.nodeOptions = loadNodeOptions();
 
-		$scope.currentSelection = $scope.linkOptions[0];
+		$scope.selectPaletteOption = function(selectedOption, isNode) {
+			//Notifies the editor graph that an option has been selected
+			paletteSelection.makeSelection(selectedOption.optionType, isNode)
+			$scope.currentSelection = paletteSelection.selectedOption.optionType;
+		}
 	}
 
 	// Loads the list of available link options
@@ -42,9 +41,9 @@ var app = angular.module('frontendApp.directives.palettePanel', [])
 		// TODO: Load the available link options from a config
 		var linkOptions = [{
 								linkIndex : 0,
-								linkType : "screenTransitionLink",
+								optionType : "screenTransitionLink",
 								label : "Screen Transition Link",
-								icon : "images/ScreenTransitionLinkIcon.svg",
+								icon : "images/ScreenTransitionLinkIcon.svg"
 							}];
 
 		return linkOptions;
@@ -56,15 +55,15 @@ var app = angular.module('frontendApp.directives.palettePanel', [])
 		// TODO: Load the available link options from a config
 		var nodeOptions = [{
 							listIndex : 0,
-							nodeType : "appProperties",
+							optionType : "appProperties",
 							label : "App Properties",
-							icon : "images/AppPropertiesIcon.svg",
+							icon : "images/AppPropertiesIcon.svg"
 						},
 						{
 							listIndex : 1,
-							nodeType : "screenNode",
+							optionType : "screenNode",
 							label : "Screen Node",
-							icon : "images/DefaultScreenIcon.svg",
+							icon : "images/DefaultScreenIcon.svg"
 						}];
 
 		return nodeOptions;

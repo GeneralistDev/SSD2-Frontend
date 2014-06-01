@@ -1,8 +1,9 @@
 'use strict';
 
 
-// This is an event object that contains the application context data.
-// When the context changes an event is fired. 
+// This is an event object that maintains the attributes panel context state information (i.e., .
+// what node/link is currently selected).
+// When the attributes context changes an event is fired. 
 //Singleton
 var app = angular.module('frontendApp.services.attributesContext', [])
   .service('attributesContext', function($rootScope) {
