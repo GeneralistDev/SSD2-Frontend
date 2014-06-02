@@ -188,6 +188,29 @@ function myGraph(rootElement, width, height) {
         return node.attributes.name; //TODO: modify text based on node type
       });
 
+    // if(node.attributes.nodeType === "screenNode") {
+
+    //   if(node.attributes.isTab && (node.attributes.apiDomain !== "") {
+    //     node.imagePath = "images/<>.svg"; //TODO: modify text based on node type
+
+    //   } else if(node.attributes.isTab) {
+    //     node.imagePath = "images/<>.svg"; //TODO: modify text based on node type
+
+    //   }
+    //   else if(node.attributes.apiDomain !== "") {
+    //     node.imagePath = "images/<>.svg";
+
+    //   } else {
+    //     node.imagePath = "images/DefaultScreenIcon.svg"; //Default
+
+    //   }
+
+    //   var image = d3.select("[id='node_image_ " + node.id + "']");
+
+    //   image.attr("xlink:href", function(d) {
+    //       return d.imagePath;
+    //   })
+
     // Find the visuals
     // update visuals
     // nodeCount--;
@@ -345,6 +368,29 @@ function myGraph(rootElement, width, height) {
 
   var drag = force.drag();
 
+  // define arrow markers for graph links
+  vis.append('svg:defs').append('svg:marker')
+      .attr('id', 'end-arrow')
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', 6)
+      .attr('markerWidth', 3)
+      .attr('markerHeight', 3)
+      .attr('orient', 'auto')
+    .append('svg:path')
+      .attr('d', 'M0,-5L10,0L0,5')
+      .attr('fill', '#000');
+
+  vis.append('svg:defs').append('svg:marker')
+    .attr('id', 'start-arrow')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 3)
+    .attr('markerHeight', 3)
+    .attr('orient', 'auto')
+  .append('svg:path')
+    .attr('d', 'M10,-5L0,0L10,5')
+    .attr('fill', '#000');
+
   // Creates representations for any new nodes or links that have been added to d3.force 
   // and binds their appropriate visual properties to them. 
   var update = function () {
@@ -377,9 +423,13 @@ function myGraph(rootElement, width, height) {
         .attr("link-type",  function(d) {
           return d.linkType;
         }) 
+        .attr("stroke-dasharray", function(d) {
+          return [10,2];
+        })
         .attr("id", function(d) {
           return "link_ "+d.id;
         })
+        .style('marker-end', function(d) { return 'url(#end-arrow)'; })
         .on('mousedown', function(d){ // Binding the select event to the actual link path
           d3.event.stopPropagation();  //TODO: fix precision problem
           _self.dispatch.linkMouseDown(d);
@@ -468,6 +518,9 @@ function myGraph(rootElement, width, height) {
         })
         .attr("height", function(d) {
           return d.imageHeight;
+        })
+        .attr("id", function(d) {
+          return "node_image_ "+d.id;
         });
 
     // Creates a label for the node
