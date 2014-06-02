@@ -7,7 +7,7 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 		restrict : 'A',
 		replace: true,
 		scope : {},
-		template : '<h3>{{data}}</h3>', //TODO: use an external html file template
+		templateUrl : 'views/dsl-panel.html', //TODO: use an external html file template
 		controller : controller,
 	}
 
@@ -17,28 +17,53 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 	// TODO: Syntax highlighting and proper code formatting. 
 	function controller($scope, $element, $timeout) {
 
-		$scope.data = "...";
+		$scope.dsl = "...";
+		$scope.showErrorMsg = false;
+		$scope.errorMsg = "Empty Visual Model";
+
 		var _self = this;
+
+		$scope.$on(raptideAPIHTTP.postVisualModelErrorEvent(), function(event) {
+			$scope.showErrorMsg = true;
+			$scope.errorMsg = getErrorMsg(raptideAPIHTTP.postVisualModelResponseCode);
+		
+		});
+
+		$scope.$on(raptideAPIHTTP.putVisualModelErrorEvent(), function(event) {
+			$scope.showErrorMsg = true;
+			$scope.errorMsg = getErrorMsg(raptideAPIHTTP.postVisualModelResponseCode);
+		});
+
+		$scope.$on(raptideAPIHTTP.postVisualModelOKEvent(), function(event) {
+			$scope.showErrorMsg = false;
+			$scope.errorMsg = "";
+		});
+
     	$scope.$on(raptideAPIHTTP.putVisualModelOKEvent(), function(event) {
     		//request dsl update from server
+
+			$scope.showErrorMsg = false;
+			$scope.errorMsg = "";
+
     		try {
 	    		raptideAPIHTTP.getDSL(function(data) { // On success
 	    			$timeout(function() {
 	    				if(data === "" ) {
-	    					data = "... (server responded with nothing)";
+	    					data = "..."; //TODO: remove this
 	    				}
-
-	    				$scope.data = data;
 	    				console.log("Data:" + data);
-	    				// $scope.apply();
-	    				//Notify the visualModelValidStateService that the visual model is valid
+
+	    				$scope.dsl = data;
+	    				
+	    				$scope.showErrorMsg = false;
 	    			});
 	    		},
 	    		function(data, status) { // On error
 
 	    			//TODO: interpret error code and use as part of the error message?
-	    			$scope.data = data;
-	    			_self.$window.alert("Invalid Visual Model:" + data );
+	    			$scope.dsl = "...";
+	    			$scope.showErrorMsg = true;
+	    			$scope.errorMsg = "Invalid Visual Model:" + data; 
 
 	    		});
     		} catch(e) {
@@ -50,5 +75,42 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 			    // TODO: handle exception here
     		}
     	});
+		
+		// Returns an appropriate error message string, based on the given response code.
+		function getErrorMsg(responseCode) {
+			switch( responseCode )
+			{
+				case 400: //Bad Request
+					return "The visual model violates the validation contraints";
+
+				case 401: //Unauthorized
+					return "Failed to authenticate this session";
+
+				case 403: //Forbidden
+					return "Failed to authenticate this session";
+
+				case 404: //Not found
+					return "Server has been restarted, please refresh the page (sorry)";
+
+				case 406: //Not Acceptable
+					return "Invalid visual model JSON";
+
+				case 410: //Gone
+					return "Your session has timed out, refresh the page (sorry)";
+
+				case 500: //Internal Server Error
+					return "Server has encountered a seriouse problem";
+
+				case 503: //Service Unavailable
+					return "Server is offline or too busy to process the visual model";
+
+				case 510: //Not implemented
+					return "Server requires features that have not been implemented in "+
+										"order to process the visual model";
+
+				default: 
+					return "Trying to connect";
+			}
+		}
 	}
   });

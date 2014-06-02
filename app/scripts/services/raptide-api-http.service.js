@@ -15,6 +15,10 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
   	this.vismodelid = ""; //TODO: determine this more logically
     this.url = "http://localhost:9000";
 
+    this.postVisualModelResponseCode = ""; //Last response code received
+    this.getDSLResponseCode = ""; //Last response code received
+    this.putVisualModelResponseCode = ""; //Last response code received
+
     //NOTE: events are issued after the callbacks of a successful request have been executed.
 
     // Returns the unique event identifier of of the getDSLOKEvent
@@ -39,6 +43,18 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
     // This event type is issued after an ok response is recieved after a postVisualModel request.
     this.postVisualModelOKEvent = function() {
       return "attributesContext.postVisualModelOKEvent";
+    }
+
+    // Returns the unique event identifier of of the postVisualModelErrorEvent
+    // This event type is issued after an error response is recieved after a postVismodel request.
+    this.postVisualModelErrorEvent = function() {
+      return "attributesContext.postVisualModelErrorEvent";
+    }
+
+    // Returns the unique event identifier of of the putVisualModelErrorEvent
+    // This event type is issued after an error response is recieved after a putVismodel request.
+    this.putVisualModelErrorEvent = function() {
+      return "attributesContext.putVisualModelErrorEvent";
     }
 
     // Returns the link to directly download the APK file from the server.
@@ -73,12 +89,14 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
               }
       }).success(function(data, status, headers, config){
               
+              _self.getDSLResponseCode = parseInt(status);
               console.log("GET DSL request was successful");
               successCallback(data);
               $rootScope.$broadcast(_self.getDSLOKEvent()); 
               //Fire getDSL ok event
       }). error(function(data, status, headers, config) {
 
+              _self.getDSLResponseCode = parseInt(status);
               // TODO: case the status and provide a suitable error message based on the response code
               console.log("GET DSL request was unsuccessful. Error code: " + parseInt(status));
               $rootScope.$broadcast(_self.getDSLErrorEvent()); 
@@ -108,15 +126,19 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
                 'Content-Type': 'application/json; charset=utf-8'
               }
       }).success(function(data, status, headers, config){
-              
+
+              _self.putVisualModelResponseCode = parseInt(status);
               console.log("PUT vismodel request was successful");
               successCallback(data);
               $rootScope.$broadcast(_self.putVisualModelOKEvent()); 
          
       }). error(function(data, status, headers, config) {
 
+              _self.putVisualModelResponseCode = parseInt(status);
+
               console.log("PUT vismodel request was unsuccessful. Error code: " + parseInt(status));
               // Inform the presentation that an error indication should be displayed.
+              $rootScope.$broadcast(_self.putVisualModelErrorEvent()); 
               errorCallBack(data, status);
       });
     }
@@ -138,7 +160,7 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
               }
       }).success(function(data, status, headers, config){
               _self.vismodelid = data.id;
-              
+              _self.postVisualModelResponseCode = parseInt(status);
               console.log("POST vismodel request was successful. Key retreved was " + _self.vismodelid);
               successCallback(data);
               $rootScope.$broadcast(_self.postVisualModelOKEvent()); 
@@ -146,8 +168,11 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
       }). error(function(data, status, headers, config) {
               // called asynchronously if an error occurs
               // or server returns response with an error status.
+              _self.postVisualModelResponseCode = parseInt(status);
+
               console.log("POST vismodel request was unsuccessful. Error code: " + parseInt(status));
               //Fire getDSL fail event
+              $rootScope.$broadcast(_self.postVisualModelErrorEvent()); 
               errorCallBack(data, status);
               // throw "exception";
       });

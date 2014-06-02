@@ -6,7 +6,15 @@
 angular.module('frontendApp')
   .controller('MainCtrl', function ($window, $scope, $compile, $timeout, $document, raptideAPIHTTP ) {
 
-  	$scope.validVismodel = false; // Download button is greyed out by default
+  	$scope.downloadAvailable = false; // Download button is greyed out by default
+
+  	$scope.$on(raptideAPIHTTP.postVisualModelErrorEvent(), function(event) {
+		$scope.downloadAvailable = false;
+	});
+
+	$scope.$on(raptideAPIHTTP.putVisualModelErrorEvent(), function(event) {
+		$scope.downloadAvailable = false;
+	});
 
   	// Sets the download APK link
 	$scope.$on(raptideAPIHTTP.postVisualModelOKEvent(), function(event) {
@@ -16,12 +24,12 @@ angular.module('frontendApp')
 
 	$scope.$on(raptideAPIHTTP.getDSLErrorEvent(), function(event) {
 
-		$scope.validVismodel = false; //Greys out the download button
+		$scope.downloadAvailable = false; //Greys out the download button
 	});
 
 	$scope.$on(raptideAPIHTTP.getDSLOKEvent(), function(event) {
 
-		$scope.validVismodel = true; //Ungreys the download button (so the user can download the APK)
+		$scope.downloadAvailable = true; //Ungreys the download button (so the user can download the APK)
 	});
 
 	//TODO: session validation
