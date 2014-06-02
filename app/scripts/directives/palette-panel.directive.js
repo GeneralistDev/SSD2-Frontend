@@ -33,6 +33,7 @@ var app = angular.module('frontendApp.directives.palettePanel', [])
 			paletteSelection.makeSelection(selectedOption.optionType, isNode)
 			// $scope.currentSelection = paletteSelection.selectedOption.optionType;
 			$scope.currentSelection = selectedOption.label;
+			
 		}
 	}
 

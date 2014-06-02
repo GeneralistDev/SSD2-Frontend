@@ -6,13 +6,22 @@
 angular.module('frontendApp')
   .controller('MainCtrl', function ($window, $scope, $compile, $timeout, $document, raptideAPIHTTP ) {
 
+  	$scope.validVismodel = false; // Download button is greyed out by default
 
   	// Sets the download APK link
 	$scope.$on(raptideAPIHTTP.postVisualModelOKEvent(), function(event) {
 
-		//TODO: set download link to grey by default
-		//TODO: set download link to available after the first successful post request (or after SNMP trap)
 		$scope.url = raptideAPIHTTP.getAPKURL();
+	});
+
+	$scope.$on(raptideAPIHTTP.getDSLErrorEvent(), function(event) {
+
+		$scope.validVismodel = false; //Greys out the download button
+	});
+
+	$scope.$on(raptideAPIHTTP.getDSLOKEvent(), function(event) {
+
+		$scope.validVismodel = true; //Ungreys the download button (so the user can download the APK)
 	});
 
 	//TODO: session validation

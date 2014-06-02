@@ -2,7 +2,7 @@
  
  // The DSL-Panel Directive handles the presentation of the DSL data retrieved from the RAPTIDE API.
 var app = angular.module('frontendApp.directives.dslPanel', [])
-  .directive('dslPanel', function($compile, raptideAPIHTTP) {
+  .directive('dslPanel', function($compile, $window, raptideAPIHTTP ) {
 	return {
 		restrict : 'A',
 		replace: true,
@@ -16,8 +16,9 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 	//
 	// TODO: Syntax highlighting and proper code formatting. 
 	function controller($scope, $element, $timeout) {
-		$scope.data = "this is the dsl panel";
 
+		$scope.data = "...";
+		var _self = this;
     	$scope.$on(raptideAPIHTTP.putVisualModelOKEvent(), function(event) {
     		//request dsl update from server
     		try {
@@ -30,9 +31,14 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 	    				$scope.data = data;
 	    				console.log("Data:" + data);
 	    				// $scope.apply();
+	    				//Notify the visualModelValidStateService that the visual model is valid
 	    			});
 	    		},
 	    		function(data, status) { // On error
+
+	    			//TODO: interpret error code and use as part of the error message?
+	    			$scope.data = data;
+	    			_self.$window.alert("Invalid Visual Model:" + data );
 
 	    		});
     		} catch(e) {
@@ -41,7 +47,6 @@ var app = angular.module('frontendApp.directives.dslPanel', [])
 			    } else {
 			        console.log("Unknown exception was handled");
 			    }
-			    // console.log("Got here");
 			    // TODO: handle exception here
     		}
     	});

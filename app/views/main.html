@@ -1,6 +1,7 @@
 <div class="header">
   <ul class="nav nav-pills pull-right">
-    <li><a target="_self" download="NodeOutput.jar" href="{{ url }}">Download APK</a></li>
+    <li class="active" ng-show="validVismodel"><a target="_self" download="NodeOutput.jar" href="{{ url }}">Download APK</a></li>
+    <li class="disabled" ng-show="!validVismodel"><a  target="_self">Download APK</a></li>
   </ul>
  <!-- <div attributes-panel></div> -->
 </div>

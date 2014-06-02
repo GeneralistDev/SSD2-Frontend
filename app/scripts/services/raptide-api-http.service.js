@@ -23,6 +23,12 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
       return "attributesContext.getDSLOKEvent";
     }
 
+    // Returns the unique event identifier of of the getDSLErrorEvent
+    // This event type is issued after an error response is recieved after a getDSL request.
+    this.getDSLErrorEvent = function() {
+      return "attributesContext.getDSLErrorEvent";
+    }
+
     // Returns the unique event identifier of the updateVisualModelOKEvent. 
     // This event type is issued after an ok response is recieved after a updateVisualModel request.
     this.putVisualModelOKEvent = function() {
@@ -75,7 +81,7 @@ var app = angular.module('frontendApp.services.raptideAPIHTTP', [])
 
               // TODO: case the status and provide a suitable error message based on the response code
               console.log("GET DSL request was unsuccessful. Error code: " + parseInt(status));
-
+              $rootScope.$broadcast(_self.getDSLErrorEvent()); 
               errorCallBack(data, status);
       });
     }
