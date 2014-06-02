@@ -188,29 +188,30 @@ function myGraph(rootElement, width, height) {
         return node.attributes.name; //TODO: modify text based on node type
       });
 
-    // if(node.attributes.nodeType === "screenNode") {
+    //Changes the icon of the Screen node based on it's attributes
+    if(node.nodeType === "screenNode") {
+      
+      if(node.attributes.isTab && (node.attributes.apiDomain !== "")) {
+        node.imagePath = "images/GloballyAccessibleAPIScreenIcon.svg"; 
 
-    //   if(node.attributes.isTab && (node.attributes.apiDomain !== "") {
-    //     node.imagePath = "images/<>.svg"; //TODO: modify text based on node type
+      } else if(node.attributes.isTab) {
+        node.imagePath = "images/GloballyAccessibleScreenIcon.svg";
+        
 
-    //   } else if(node.attributes.isTab) {
-    //     node.imagePath = "images/<>.svg"; //TODO: modify text based on node type
+      } else if(node.attributes.apiDomain !== "") {
+        node.imagePath = "images/APIScreenIcon.svg";
 
-    //   }
-    //   else if(node.attributes.apiDomain !== "") {
-    //     node.imagePath = "images/<>.svg";
+      } else {
+        node.imagePath = "images/DefaultScreenIcon.svg"; //Default
 
-    //   } else {
-    //     node.imagePath = "images/DefaultScreenIcon.svg"; //Default
+      }
 
-    //   }
+      var image = d3.select("[id='node_image_ " + node.id + "']");
 
-    //   var image = d3.select("[id='node_image_ " + node.id + "']");
-
-    //   image.attr("xlink:href", function(d) {
-    //       return d.imagePath;
-    //   })
-
+      image.attr("xlink:href", function(d) {
+        return d.imagePath;
+      });
+    }
     // Find the visuals
     // update visuals
     // nodeCount--;
