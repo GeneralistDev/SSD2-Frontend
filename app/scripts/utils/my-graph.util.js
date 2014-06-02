@@ -46,6 +46,7 @@ function myGraph(rootElement, width, height) {
     y = y;
     id = id || ("" + (++nodeCount));
     nodeType = nodeType || "default";
+
     attributes = attributes || {name : " "};
 
     //view or presenter code
@@ -183,10 +184,37 @@ function myGraph(rootElement, width, height) {
   // Refreshes the node visuals
   this.refreshNode = function(node) {
 
-    d3.select("[id='node_text_ " + node.id + "']").text(function() {
-        return node.attributes.name;
+    //Changes the icon of the Screen node based on it's attributes
+    if(node.nodeType === "screenNode") {
+      
+      d3.select("[id='node_text_ " + node.id + "']").text(function() {
+        return node.attributes.name; //TODO: modify text based on node type
       });
 
+      if(node.attributes.isTab && (node.attributes.apiDomain !== "")) {
+        node.imagePath = "images/GloballyAccessibleAPIScreenIcon.svg"; 
+
+      } else if(node.attributes.isTab) {
+        node.imagePath = "images/GloballyAccessibleScreenIcon.svg";
+
+
+      } else if(node.attributes.apiDomain !== "") {
+        node.imagePath = "images/APIScreenIcon.svg";
+
+      } else {
+        node.imagePath = "images/DefaultScreenIcon.svg"; //Default
+
+      }
+
+      var image = d3.select("[id='node_image_ " + node.id + "']");
+
+      image.attr("xlink:href", function(d) {
+        return d.imagePath;
+      });
+    }
+    else if(node.nodeType === "appPropertiesNode") {
+
+    }
     // Find the visuals
     // update visuals
     // nodeCount--;
@@ -201,7 +229,7 @@ function myGraph(rootElement, width, height) {
   this.refreshLink = function(link) {
     d3.select("[id='link_label_"+ link.id + "']").text(function() {
         console.log("refreshLink got here!");
-        return link.attributes.name;
+        return link.attributes.condition; //TODO: modify text based on link type
       });
   }
 
@@ -262,29 +290,31 @@ function myGraph(rootElement, width, height) {
   // to the node DOM element.
   var getNodeVisualProperties = function(nodeType, attributes) {
     var textProperties = {};
-    textProperties.textValue = attributes.name; //TODO: infer from node type
+    
 
     var imageProperties = { };
 
     // Assigning the image visual properties
     switch (nodeType) {
-      case "person" : 
-        imageProperties.imagePath = "images/stick_figure.svg";
-
-        imageProperties.width = "70"; //TODO: fix so it is not hard coded
-        imageProperties.height = "70";
+      case "appPropertiesNode" : 
+        imageProperties.imagePath = "images/AppPropertiesIcon.svg";
+        textProperties.textValue = "App Properties"; //TODO: infer from node type
+        imageProperties.width = "120"; //TODO: fix so it is not hard coded
+        imageProperties.height = "120";
         break;
-      case "disconnected-link-node" : //TODO: remove
-        imageProperties.imagePath = "images/disconnected_link_node.svg";
 
-        imageProperties.width = "20";
-        imageProperties.height = "20";
+      case "screenNode" : 
+        imageProperties.imagePath = "images/DefaultScreenIcon.svg";
+        textProperties.textValue = attributes.name; //TODO: infer from node type
+        imageProperties.width = "120"; //TODO: fix so it is not hard coded
+        imageProperties.height = "120";
         break;
+
       case "default" : 
         imageProperties.imagePath = "images/stick_figure.svg";
 
-        imageProperties.width = "70";
-        imageProperties.height = "70";
+        imageProperties.width = "120";
+        imageProperties.height = "120";
         break;
       default : //usually for disconnected link end points
         imageProperties.imagePath = "images/empty.svg";//blank svg image 
@@ -342,6 +372,29 @@ function myGraph(rootElement, width, height) {
 
   var drag = force.drag();
 
+  // define arrow markers for graph links
+  vis.append('svg:defs').append('svg:marker')
+      .attr('id', 'end-arrow')
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', 6)
+      .attr('markerWidth', 3)
+      .attr('markerHeight', 3)
+      .attr('orient', 'auto')
+    .append('svg:path')
+      .attr('d', 'M0,-5L10,0L0,5')
+      .attr('fill', '#000');
+
+  vis.append('svg:defs').append('svg:marker')
+    .attr('id', 'start-arrow')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 3)
+    .attr('markerHeight', 3)
+    .attr('orient', 'auto')
+  .append('svg:path')
+    .attr('d', 'M10,-5L0,0L10,5')
+    .attr('fill', '#000');
+
   // Creates representations for any new nodes or links that have been added to d3.force 
   // and binds their appropriate visual properties to them. 
   var update = function () {
@@ -374,9 +427,13 @@ function myGraph(rootElement, width, height) {
         .attr("link-type",  function(d) {
           return d.linkType;
         }) 
+        .attr("stroke-dasharray", function(d) {
+          return [10,2];
+        })
         .attr("id", function(d) {
           return "link_ "+d.id;
         })
+        .style('marker-end', function(d) { return 'url(#end-arrow)'; })
         .on('mousedown', function(d){ // Binding the select event to the actual link path
           d3.event.stopPropagation();  //TODO: fix precision problem
           _self.dispatch.linkMouseDown(d);
@@ -403,8 +460,8 @@ function myGraph(rootElement, width, height) {
         .attr("dy", "1em")
         .attr("text-anchor", "middle")
         .text(function(d) { 
-          if(d.attributes.name !==  null) // Bind the text of the label to the element
-            return d.attributes.name; //TODO: show the primary relationship based on relationship type
+          if(d.attributes.condition !==  null) // Bind the text of the label to the element
+            return d.attributes.condition; //TODO: show the primary relationship based on relationship type
           return "default " + d.id;
         })
         .on('mousedown', function(d){
@@ -465,13 +522,20 @@ function myGraph(rootElement, width, height) {
         })
         .attr("height", function(d) {
           return d.imageHeight;
+        })
+        .attr("id", function(d) {
+          return "node_image_ "+d.id;
         });
 
     // Creates a label for the node
     nodeEnter.append("text")
         .attr("class", "node-text")
-        .attr("dx", ".35em") 
-        .attr("dy", 80)
+        .attr("dx", function(d){
+          return "-40"; 
+        }) 
+        .attr("dy", function(d){
+          return (d.imageY + (120) + 20); //TODO: fix so this isn't hard coded 
+        }) 
         .attr("id", function(d) {
           return "node_text_ "+d.id;
         })

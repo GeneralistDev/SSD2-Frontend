@@ -1,8 +1,9 @@
 'use strict';
 
 
-// This is an event object that contains the application context data.
-// When the context changes an event is fired. 
+// This is an event object that maintains the attributes panel context state information (i.e., .
+// what node/link is currently selected).
+// When the attributes context changes an event is fired. 
 //Singleton
 var app = angular.module('frontendApp.services.attributesContext', [])
   .service('attributesContext', function($rootScope) {
@@ -28,7 +29,7 @@ var app = angular.module('frontendApp.services.attributesContext', [])
 
   	// Changes the attributes context. 
   	this.changeContext = function(selectedEntity, isNode) {
-      console.log("CHanged context:");
+      console.log("Changed context:");
       console.log(JSON.stringify(selectedEntity.attributes));
   		this.context.entity = selectedEntity;
   		this.context.entityIsNode = isNode;
@@ -49,6 +50,8 @@ var app = angular.module('frontendApp.services.attributesContext', [])
     this.updateAttributes = function( updatedEntity, isNode) {
       if((isNode === this.context.entityIsNode ) && (updatedEntity.id === this.context.entity.id) ) {
         this.context.entity = updatedEntity;
+        console.log("Attributes Updated:");
+        console.log(JSON.stringify(updatedEntity.attributes));
         $rootScope.$broadcast(this.updateAttributesEvent());
       } else {
         //Throw desynchronisation error!

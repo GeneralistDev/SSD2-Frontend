@@ -45,7 +45,7 @@ var app = angular.module('frontendApp.directives.w2uiLayout', [])
 	    // Maps the panel content to each of the appropriate panel directives
 	    w2ui['layout'].content('right', '<div attributes-panel></div>');
 	    w2ui['layout'].content('main', '<div editor-graph-panel></div>');
-	    w2ui['layout'].content('left', '<div pallet-panel></div>');
+	    w2ui['layout'].content('left', '<div palette-panel></div>');
 	    w2ui['layout'].content('bottom', '<div dsl-panel></div>');
 
 	    // After this code is executed the angular directives contained in each of the panels is compiled 

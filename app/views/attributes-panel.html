@@ -1,10 +1,90 @@
 <div>
-	<form>
-		Name: 
-		<input type='text' name='attributeName' ng-model='context.entity.attributes.name' 
-		ng-change='attributesChangeHandler()'>
-	</form>
+	<br>
+	<!-- Screen Transition Link Attributes Form Template -->
+	<div ng-show="context.entity.linkType==='screenTransitionLink'">
+		<form>
+			<p>Transition Condition: <br>
+			<select ng-model='context.entity.attributes.condition'
+					ng-change='attributesChangeHandler()'>
+				<option value="None">None</option>
+				<option value="ButtonClick">Button Click</option>
+				<option value="ListItemClick">List Item Click</option>
+			</select>
+		</form>
+	</div>
+
+	<!-- App Properties Node Attributes Form Template -->
+	<div ng-show="context.entity.nodeType==='appPropertiesNode'">
+		<form>
+			App Name: <br> 
+			<input type='text' name='appName' ng-model='context.entity.attributes.appName' 
+			ng-change='attributesChangeHandler()'>
+
+			<p>Navigation Type: <br>
+			<select ng-model='context.entity.attributes.navigationType' 
+			ng-change='attributesChangeHandler()'>
+				<option value="None">None</option>
+				<option value="Drawer">Drawer</option>
+				<option value="Tabs">Tabs</option>
+			</select></p>
+  
+			<p>Icon: <br> 
+			<input type='text' name='icon' ng-model='context.entity.attributes.icon' 
+			ng-change='attributesChangeHandler()'> </p>
+
+		</form>
+	</div>
+
+	<!-- Screen Node Attributes Form Template -->
+	<div ng-show="context.entity.nodeType==='screenNode'">
+		<form>
+			<p>Name (Shown on the Graph and the ID in the DSL): <br> 
+			<input type='text' name='name' ng-model='context.entity.attributes.name' 
+			ng-change='attributesChangeHandler()'><br>
+
+			<input type='checkbox' name='isLanding' ng-model='context.entity.attributes.isLanding' 
+			ng-change='attributesChangeHandler()'>Is the Landing Page</input>
+			</p>
+
+			<p>Screen Label (Shown in the Action Bar: <br> 
+			<input type='text' name='screenLabel' ng-model='context.entity.attributes.screenLabel' 
+			ng-change='attributesChangeHandler()'></p>
+
+			<input type='checkbox' name='isTab' ng-model='context.entity.attributes.isTab' 
+			ng-change='attributesChangeHandler()'> Is Tab</input></p>
+
+			<p>Tab Label (Shown on the tab /drawer): <br> 
+			<input type='text' name='tabLabel' ng-model='context.entity.attributes.tabLabel' 
+			ng-change='attributesChangeHandler()'><br>
+  			
+  			<p>API Domain: <br>
+			<input type='text' name='apiDomain' ng-model='context.entity.attributes.apiDomain' 
+			ng-change='attributesChangeHandler()'></p>
+
+			<p>Layout Items: <br>
+			<div ng-repeat="layoutItem in context.entity.attributes.layoutItems">
+				<div>
+					<select ng-model='layoutItem.viewType'
+					ng-change='attributesChangeHandler()'>
+						<option value="NA" disabled selected>View Type</option>
+						<option value="Button">Button</option>
+						<option value="Label">Label</option>
+						<option value="Web">Web</option>
+						<option value="List">List</option>
+					</select>
+					<input type='text' name='value' ng-model='layoutItem.value' 
+						ng-change='attributesChangeHandler()' placeholder="Value">
+				</div>
+			</div></p><br>
+			
+			<input type='button' value="Add Item" 
+			ng-click="addLayoutItem()">
+			<input type='button' value="Remove Item" 
+			ng-click="removeLayoutItem()"></p>
+			</p>
+		</form>
+	</div>
 
 	<p>ID: {{context.entity.id}}</p>
-	<p>Entity Type: {{enitityType}}</p>
+	<p>Entity Type: {{enitityType}}</p><br>
 </div>

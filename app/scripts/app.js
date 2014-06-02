@@ -9,11 +9,12 @@ angular.module('frontendApp', [
   'frontendApp.services.attributesContext', // Services
   'frontendApp.services.modelUpdater',
   'frontendApp.services.raptideAPIHTTP',
+  'frontendApp.services.paletteSelection',
 
   'frontendApp.directives.attributesPanel', // Directives
   'frontendApp.directives.w2uiLayout',
   'frontendApp.directives.editorGraphPanel',
-  'frontendApp.directives.palletPanel',
+  'frontendApp.directives.palettePanel',
   'frontendApp.directives.dslPanel'
 ])
   .config(function ($routeProvider, $httpProvider) {
