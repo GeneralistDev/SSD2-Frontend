@@ -184,19 +184,19 @@ function myGraph(rootElement, width, height) {
   // Refreshes the node visuals
   this.refreshNode = function(node) {
 
-    d3.select("[id='node_text_ " + node.id + "']").text(function() {
-        return node.attributes.name; //TODO: modify text based on node type
-      });
-
     //Changes the icon of the Screen node based on it's attributes
     if(node.nodeType === "screenNode") {
       
+      d3.select("[id='node_text_ " + node.id + "']").text(function() {
+        return node.attributes.name; //TODO: modify text based on node type
+      });
+
       if(node.attributes.isTab && (node.attributes.apiDomain !== "")) {
         node.imagePath = "images/GloballyAccessibleAPIScreenIcon.svg"; 
 
       } else if(node.attributes.isTab) {
         node.imagePath = "images/GloballyAccessibleScreenIcon.svg";
-        
+
 
       } else if(node.attributes.apiDomain !== "") {
         node.imagePath = "images/APIScreenIcon.svg";
@@ -211,6 +211,9 @@ function myGraph(rootElement, width, height) {
       image.attr("xlink:href", function(d) {
         return d.imagePath;
       });
+    }
+    else if(node.nodeType === "appPropertiesNode") {
+
     }
     // Find the visuals
     // update visuals

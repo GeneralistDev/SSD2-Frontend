@@ -15,7 +15,7 @@ var app = angular.module('frontendApp.services.modelUpdater', [])
 		// If a delay is required it will instead schedule another periodical update.
 		this.periodicalUpdate = function(delay){
 		    $timeout(function() {
-
+		    	// console.log(JSON.stringify(visualModel)); //TODO: remove
 		    	if(delayRequired === true) {
 		    		delayRequired = false;
 		    		_self.periodicalUpdate(delay);
