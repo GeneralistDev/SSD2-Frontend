@@ -111,6 +111,7 @@ function editor(graph, attributesContext, modelUpdater, paletteSelection) {
       switch(paletteSelection.selectedOption.optionType) {
         case "screenNode":
           attributes = {
+                      "isLanding": false,
                       "isTab": false,
                       "tabLabel": "",
                       "screenLabel": "",

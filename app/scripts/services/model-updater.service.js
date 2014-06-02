@@ -14,8 +14,9 @@ var app = angular.module('frontendApp.services.modelUpdater', [])
 		// Performs a putVisModel request to the raptide api if an update is required.
 		// If a delay is required it will instead schedule another periodical update.
 		this.periodicalUpdate = function(delay){
+
 		    $timeout(function() {
-		    	// console.log(JSON.stringify(visualModel)); //TODO: remove
+		    	// console.log(JSON.stringify(_self.visualModel)); //TODO: remove
 		    	if(delayRequired === true) {
 		    		delayRequired = false;
 		    		_self.periodicalUpdate(delay);
