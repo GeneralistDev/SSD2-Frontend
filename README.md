@@ -3,6 +3,8 @@ README
 This repository is the frontend to the RAPTIDE web tool. If you are looking for the backend repository then [click here](http://github.com/rlgod/SSD2-Backend).
 ## Demo
 For a short demo of the working product see our [YouTube Demo](https://www.youtube.com/watch?v=FUUVBXXRfRU) 
+## Architecture
+This [architecture document](https://docs.google.com/document/d/1ymm5JxymRaUHveXnVgvbNbWf8D08Hx2GNmioxPNem50/edit#heading=h.br3fwomvrzib) outlines the structure of both parts of the RAPTIDE program.
 ##Setup and Dependencies
 Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
 
