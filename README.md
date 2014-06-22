@@ -1,5 +1,6 @@
 README
 ===
+This repository is the frontend to the RAPTIDE web tool. If you are looking for the backend repository then [click here](http://github.com/rlgod/SSD2-Backend).
 ##Setup and Dependencies
 Author: <a href=mailto:dparker.tech@gmail.com>Daniel Parker</a>
 
